@@ -23,7 +23,7 @@ class Handler extends ExceptionHandler
      */
     protected $dontReport = [
         MyException::class,
-        ValidationException::class,
+        // ValidationException::class,
         AuthorizationException::class,
         ModelNotFoundException::class,
         JWTException::class,

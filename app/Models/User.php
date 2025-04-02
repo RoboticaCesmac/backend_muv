@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Tymon\JWTAuth\Contracts\JWTSubject as JWTSubjectContract;
 
-class User extends Authenticatable
+class User extends Authenticatable implements JWTSubjectContract
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -15,18 +16,19 @@ class User extends Authenticatable
     /**
      * The attributes that are mass assignable.
      *
-     * @var list<string>
+     * @var array<int, string>
      */
     protected $fillable = [
         'name',
         'email',
         'password',
+        'email_verified_at',
     ];
 
     /**
      * The attributes that should be hidden for serialization.
      *
-     * @var list<string>
+     * @var array<int, string>
      */
     protected $hidden = [
         'password',
@@ -34,15 +36,67 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that should be cast.
      *
-     * @return array<string, string>
+     * @var array<string, string>
      */
-    protected function casts(): array
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
+
+    /**
+     * Get the identifier that will be stored in the subject claim of the JWT.
+     *
+     * @return mixed
+     */
+    public function getJWTIdentifier()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->getKey();
+    }
+
+    /**
+     * Return a key value array, containing any custom claims to be added to the JWT.
+     *
+     * @return array
+     */
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
+
+    /**
+     * Get all tokens for the user.
+     */
+    public function tokens(): MorphMany
+    {
+        return $this->morphMany(Token::class, 'tokenable');
+    }
+
+    /**
+     * Get the user's email verification token.
+     */
+    public function emailVerificationToken(): MorphMany
+    {
+        return $this->morphMany(Token::class, 'tokenable')
+            ->where('type', 'email_verification');
+    }
+
+    /**
+     * Get the user's password reset token.
+     */
+    public function passwordResetToken(): MorphMany
+    {
+        return $this->morphMany(Token::class, 'tokenable')
+            ->where('type', 'password_reset');
+    }
+
+    /**
+     * Get the user's active tokens.
+     */
+    public function activeTokens(): MorphMany
+    {
+        return $this->morphMany(Token::class, 'tokenable')
+            ->where('expires_at', '>', now());
     }
 }
