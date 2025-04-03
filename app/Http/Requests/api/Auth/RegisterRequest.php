@@ -1,19 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Auth;
+namespace App\Http\Requests\api\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class LoginRequest extends FormRequest
+class RegisterRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     /**
      * Get the validation rules that apply to the request.
      *
@@ -22,8 +14,9 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'email'],
-            'password' => ['required', 'string', 'min:6'],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:6', 'confirmed'],
         ];
     }
 
@@ -35,10 +28,15 @@ class LoginRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'name.required' => 'O campo nome é obrigatório.',
+            'name.max' => 'O nome não pode ter mais que 255 caracteres.',
             'email.required' => 'O campo e-mail é obrigatório.',
             'email.email' => 'Digite um e-mail válido.',
+            'email.max' => 'O e-mail não pode ter mais que 255 caracteres.',
+            'email.unique' => 'Este e-mail já está em uso.',
             'password.required' => 'O campo senha é obrigatório.',
             'password.min' => 'A senha deve ter no mínimo 6 caracteres.',
+            'password.confirmed' => 'A confirmação de senha não corresponde.',
         ];
     }
 } 

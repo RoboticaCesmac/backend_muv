@@ -2,19 +2,24 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Token extends Model
 {
+    use HasFactory;
+
+    protected $primaryKey = 'email';
+    public $incrementing = false;
+    protected $keyType = 'string';
     /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
     protected $fillable = [
+        'email',
         'token',
-        'type',
         'expires_at',
     ];
 
@@ -26,14 +31,6 @@ class Token extends Model
     protected $casts = [
         'expires_at' => 'datetime',
     ];
-
-    /**
-     * Get the parent tokenable model (user, etc).
-     */
-    public function tokenable(): MorphTo
-    {
-        return $this->morphTo();
-    }
 
     /**
      * Check if the token is expired.

@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\api\Controllers;
+namespace App\Http\Controllers\api\Auth;
 
-use App\Http\Requests\Auth\LoginRequest;
-use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Requests\api\Auth\LoginRequest;
+use App\Http\Requests\api\Auth\RegisterRequest;
 use App\Services\JwtAuthService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;

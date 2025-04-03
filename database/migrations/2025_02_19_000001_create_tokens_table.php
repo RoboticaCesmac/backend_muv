@@ -12,10 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tokens', function (Blueprint $table) {
-            $table->id();
-            $table->morphs('tokenable');
+            $table->string('email')->primary();
             $table->string('token');
-            $table->string('type');
             $table->timestamp('expires_at');
             $table->timestamps();
         });
