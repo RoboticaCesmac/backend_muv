@@ -19,9 +19,14 @@ class User extends Authenticatable implements JWTSubjectContract
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'user_name',
         'email',
         'password',
+        'gender',
+        'date_of_birth',
+        'total_points',
+        'total_km',
+        'first_login',
         'email_verified_at',
     ];
 
@@ -43,6 +48,9 @@ class User extends Authenticatable implements JWTSubjectContract
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'is_admin' => 'boolean',
+        'date_of_birth' => 'date',
+        'first_login' => 'boolean',
     ];
 
     /**

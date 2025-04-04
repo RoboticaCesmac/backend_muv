@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
+use App\Exceptions\Token\TokenNotFoundException;
+use App\Models\Token;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -25,7 +25,9 @@ class JwtAuthService
             ]);
         }
 
-        return $this->respondWithToken($token);
+        $user = JWTAuth::user();
+
+        return array_merge($this->respondWithToken($token), ['first_login' => $user->first_login]);
     }
 
     /**
@@ -36,12 +38,23 @@ class JwtAuthService
      */
     public function register(array $data): array
     {
-        $user = User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-        ]);
+        $token = Token::find($data['email']);
 
+        if (!$token || $token->token !== $data['token']) {
+            throw new TokenNotFoundException('O token fornecido é inválido.');
+        }
+
+        if ($token->isExpired()) {
+            throw new TokenNotFoundException('O token fornecido já está expirado.');
+        }
+
+        $user = User::create([
+            'user_name' => $data['user_name'],
+            'email' => $data['email'],
+            'password' => password_hash($data['password'], PASSWORD_BCRYPT),
+            'email_verified_at' => now(),
+        ]); 
+        
         $token = JWTAuth::fromUser($user);
 
         return $this->respondWithToken($token);
