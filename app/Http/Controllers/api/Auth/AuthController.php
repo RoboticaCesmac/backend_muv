@@ -19,12 +19,17 @@ class AuthController extends Controller
         $this->middleware('auth:api', ['except' => ['login', 'register']]);
     }
 
-    /**
-     * Get a JWT via given credentials.
-     */
     public function login(LoginRequest $request): JsonResponse
     {
         return response()->json($this->authService->login($request->all()), 200);
+    }
+
+    /**
+     * Get a JWT via given credentials.
+     */
+    public function loginMobile(LoginRequest $request): JsonResponse
+    {
+        return response()->json($this->authService->loginMobile($request->all()), 200);
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Exceptions\Token\TokenNotFoundException;
+use App\Exceptions\User\UserNotAdminException;
 use App\Models\Token;
 use App\Models\User;
 use Illuminate\Validation\ValidationException;
@@ -10,6 +11,24 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class JwtAuthService
 {
+
+    public function login(array $credentials): array
+    {
+        if (!$token = JWTAuth::attempt($credentials)) {
+            throw ValidationException::withMessages([
+                'email' => ['As credenciais fornecidas estão incorretas.'],
+            ]);
+        }
+
+        $user = JWTAuth::user();
+
+        if (!$user->is_admin) {
+            throw new UserNotAdminException('Você não tem permissão para acessar esta aplicação.');
+        }
+
+        return array_merge($this->respondWithToken($token));
+    }
+
     /**
      * Authenticate a user and return a JWT token.
      *
@@ -17,7 +36,7 @@ class JwtAuthService
      * @return array
      * @throws ValidationException
      */
-    public function login(array $credentials): array
+    public function loginMobile(array $credentials): array
     {
         if (!$token = JWTAuth::attempt($credentials)) {
             throw ValidationException::withMessages([

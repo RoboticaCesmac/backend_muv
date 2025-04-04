@@ -13,6 +13,7 @@ class Vehicle extends Model
     protected $fillable = [
         'name',
         'co2_per_km',
+        'icon_path',
     ];
 
     protected $casts = [

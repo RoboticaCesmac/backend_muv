@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject as JWTSubjectContract;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class User extends Authenticatable implements JWTSubjectContract
 {
@@ -106,5 +107,26 @@ class User extends Authenticatable implements JWTSubjectContract
     {
         return $this->morphMany(Token::class, 'tokenable')
             ->where('expires_at', '>', now());
+    }
+
+    public function canEdit(): bool
+    {
+        $loggedUser = JWTAuth::user();
+        
+        return $loggedUser->is_admin;
+    }
+
+    public function canDelete(): bool
+    {
+        $loggedUser = JWTAuth::user();
+
+        return $loggedUser->is_admin;
+    }
+
+    public function canUpdate(): bool
+    {
+        $loggedUser = JWTAuth::user();
+
+        return $loggedUser->is_admin;
     }
 }

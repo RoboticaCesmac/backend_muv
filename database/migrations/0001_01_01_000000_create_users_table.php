@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('total_points')->nullable();
             $table->string('date_of_birth')->nullable();
             $table->boolean('is_admin')->default(false);
-            $table ->boolean('first_login')->default(false);
+            $table->boolean('first_login')->default(false);
             $table->timestamps();
         });
 

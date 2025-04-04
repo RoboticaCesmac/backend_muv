@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->decimal('co2_per_km', 10, 2);
+            $table->string('icon_path');
             $table->timestamps();
         });
     }
