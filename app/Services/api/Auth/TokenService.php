@@ -17,7 +17,7 @@ class TokenService
         $tokenObject = Token::updateOrCreate([
             'email' => $request->get('email'),
         ], [
-            'token' => $token,
+            'token' => encrypt($token),
             'expires_at' => now()->addHours(),
         ]);
 

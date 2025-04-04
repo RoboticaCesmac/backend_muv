@@ -40,7 +40,7 @@ class JwtAuthService
     {
         $token = Token::find($data['email']);
 
-        if (!$token || $token->token !== $data['token']) {
+        if (!$token || $token->token !== encrypt($data['token'])) {
             throw new TokenNotFoundException('O token fornecido é inválido.');
         }
 
@@ -54,7 +54,7 @@ class JwtAuthService
             'password' => password_hash($data['password'], PASSWORD_BCRYPT),
             'email_verified_at' => now(),
         ]); 
-        
+
         $token = JWTAuth::fromUser($user);
 
         return $this->respondWithToken($token);

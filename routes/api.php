@@ -3,6 +3,7 @@
 use App\Http\Controllers\api\Auth\TokenController;
 use App\Http\Controllers\api\Auth\AuthController;
 use App\Http\Controllers\api\User\UserController;
+use App\Http\Controllers\api\Vehicle\VehicleController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {

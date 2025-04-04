@@ -26,7 +26,7 @@ class UserService
     public function show(int $id): User
     {
         $user = $this->user->find($id);
-        
+
         if (!$user) {
             throw new UserNotFoundException('Usuário não encontrado');
         }
@@ -65,7 +65,7 @@ class UserService
             'gender' => $data['gender'],
             'user_name' => $data['user_name'],
             'vehicle_id' => $data['vehicle_id'],
-            'first_login' => true,
+            'first_login' => false,
         ]);
 
         return $user;
