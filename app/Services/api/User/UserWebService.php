@@ -19,7 +19,7 @@ class UserWebService
 
     public function index(): LengthAwarePaginator
     {
-        return $this->user->where('email', '!=', 'admin@gmail.com')->paginate(10);
+        return $this->user->where('email', '!=', 'ADMIN')->paginate(10);
     }
 
     public function show(int $id): User
@@ -37,7 +37,7 @@ class UserWebService
         $loggedUser = JWTAuth::user();
         
         $userDestroy = $this->user->where('id', $id)
-            ->where('email', '!=', 'admin@gmail.com')
+            ->where('email', '!=', 'ADMIN')
             ->firstOrFail();
 
         if (!$loggedUser->is_admin) {

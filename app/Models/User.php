@@ -27,7 +27,7 @@ class User extends Authenticatable implements JWTSubjectContract
         'date_of_birth',
         'total_points',
         'total_km',
-        'first_login',
+        'is_first_login',
         'email_verified_at',
     ];
 
@@ -51,7 +51,7 @@ class User extends Authenticatable implements JWTSubjectContract
         'password' => 'hashed',
         'is_admin' => 'boolean',
         'date_of_birth' => 'date',
-        'first_login' => 'boolean',
+        'is_first_login' => 'boolean',
     ];
 
     /**

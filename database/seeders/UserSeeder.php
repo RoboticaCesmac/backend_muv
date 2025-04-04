@@ -10,7 +10,7 @@ class UserSeeder extends Seeder
     public function run()
     {
         UserFactory::new()
-            ->stateEmail('admin@gmail.com')
+            ->stateEmail('ADMIN')
             ->statePassword('ADMIN')
             ->stateIsAdmin(true)
             ->stateUserName('Admin')

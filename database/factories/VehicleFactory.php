@@ -14,6 +14,7 @@ class VehicleFactory extends Factory
         return [
             'name' => fake()->name(),
             'co2_per_km' => fake()->randomFloat(2, 10, 100),
+            'icon_path' => fake()->imageUrl(),
         ];
     }
 
@@ -26,6 +27,12 @@ class VehicleFactory extends Factory
     public function stateCo2PerKm(?float $co2PerKm = null) {
         return $this->state(fn (array $attributes) => [
             'co2_per_km' => $co2PerKm ?? fake()->randomFloat(2, 10, 100),
+        ]);
+    }
+
+    public function stateIconPath(?string $iconPath = null) {
+        return $this->state(fn (array $attributes) => [
+            'icon_path' => $iconPath ?? fake()->imageUrl(),
         ]);
     }
 }

@@ -46,7 +46,7 @@ class JwtAuthService
 
         $user = JWTAuth::user();
 
-        return array_merge($this->respondWithToken($token), ['first_login' => $user->first_login]);
+        return array_merge($this->respondWithToken($token), ['is_first_login' => $user->is_first_login]);
     }
 
     /**

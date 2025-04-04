@@ -19,7 +19,7 @@ class UserMobileService
     {
         $user = JWTAuth::user();
 
-        if (!$user->first_login) {
+        if (!$user->is_first_login) {
             throw new UserHasAlreadyLoggedInFirst('Usuário já realizou o primeiro login');
         }
 
@@ -28,7 +28,7 @@ class UserMobileService
             'gender' => $data['gender'],
             'user_name' => $data['user_name'],
             'vehicle_id' => $data['vehicle_id'],
-            'first_login' => false,
+            'is_first_login' => false,
         ]);
 
         return $user;
