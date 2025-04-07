@@ -45,8 +45,7 @@ class Handler extends ExceptionHandler
     public static function config(Exceptions $exceptions): void
     {
         $exceptions->render(function (Throwable $e, Request $request) {
-            $handler = new static(app());
-            return $handler->render($request, $e);
+            return (new static(app()))->render($request, $e);
         });
     }
 
@@ -59,69 +58,65 @@ class Handler extends ExceptionHandler
      */
     protected function handleException(Request $request, Throwable $e): TypeException
     {
-        if ($e instanceof ValidationException) {
-            return new TypeException(
-                'Erro na validação de campo.',
-                $e,
-                Response::HTTP_UNPROCESSABLE_ENTITY,
-                $e->errors()
-            );
-        }
+        switch (true) {
+            case $e instanceof ValidationException:
+                return new TypeException(
+                    'Erro na validação de campo.',
+                    $e,
+                    Response::HTTP_UNPROCESSABLE_ENTITY,
+                    $e->errors()
+                );
 
-        if ($e instanceof AuthorizationException) {
-            return new TypeException(
-                'Esta ação não é autorizada.',
-                $e,
-                Response::HTTP_FORBIDDEN
-            );
-        }
+            case $e instanceof AuthorizationException:
+                return new TypeException(
+                    'Esta ação não é autorizada.',
+                    $e,
+                    Response::HTTP_FORBIDDEN
+                );
 
-        if ($e instanceof ModelNotFoundException && $request->expectsJson()) {
-            $model = $e->getModel();
-            $id = implode(', ', (array) $e->getIds());
-            return new TypeException(
-                "Nenhum resultado de consulta para o modelo [$model] $id",
-                $e,
-                Response::HTTP_NOT_FOUND
-            );
-        }
+            case $e instanceof ModelNotFoundException && $request->expectsJson():
+                $model = $e->getModel();
+                $id = implode(', ', (array) $e->getIds());
+                return new TypeException(
+                    "Nenhum resultado de consulta para o modelo [$model] $id",
+                    $e,
+                    Response::HTTP_NOT_FOUND
+                );
 
-        if ($e instanceof QueryException) {
-            $errorsCode = [
-                '1400' => 'Não será possível continuar com a inclusão, existe campo que não pode ser vazio.',
-                '1407' => 'Não será possível continuar com a atualização, existe campo que não pode ser vazio.',
-                '2292' => 'Não será possível continuar com a exclusão, ela é referenciada por outros registros no banco de dados.',
-            ];
-            $errorCodeUnregistered = 'Não foi possível executar a instrução no banco de dados.';
-            $message = $errorsCode[$e->getCode()] ?? $errorCodeUnregistered;
-            return new TypeException($message, $e, Response::HTTP_NOT_ACCEPTABLE);
-        }
+            case $e instanceof QueryException:
+                $errorsCode = [
+                    '1400' => 'Não será possível continuar com a inclusão, existe campo que não pode ser vazio.',
+                    '1407' => 'Não será possível continuar com a atualização, existe campo que não pode ser vazio.',
+                    '2292' => 'Não será possível continuar com a exclusão, ela é referenciada por outros registros no banco de dados.',
+                ];
+                $errorCodeUnregistered = 'Não foi possível executar a instrução no banco de dados.';
+                $message = $errorsCode[$e->getCode()] ?? $errorCodeUnregistered;
+                return new TypeException($message, $e, Response::HTTP_NOT_ACCEPTABLE);
 
-        if ($e instanceof MyException) {
-            return new TypeException($e->getMessage(), $e, $e->getStatusCode());
-        }
+            case $e instanceof MyException:
+                return new TypeException($e->getMessage(), $e, $e->getStatusCode());
 
-        if ($e instanceof JWTException) {
-            return new TypeException(
-                'Token de autorização não encontrado',
-                $e,
-                Response::HTTP_UNAUTHORIZED
-            );
-        }
+            case $e instanceof JWTException:
+                return new TypeException(
+                    'Token de autorização não encontrado',
+                    $e,
+                    Response::HTTP_UNAUTHORIZED
+                );
 
-        if ($e instanceof DecryptException) {
-            return new TypeException(
-                'Você não tem permissão para acessar este recurso.',
-                $e,
-                Response::HTTP_FORBIDDEN
-            );
-        }
+            case $e instanceof DecryptException:
+                return new TypeException(
+                    'Você não tem permissão para acessar este recurso.',
+                    $e,
+                    Response::HTTP_FORBIDDEN
+                );
 
-        return new TypeException(
-            "[{$e->getCode()}] - {$e->getMessage()}",
-            $e,
-            Response::HTTP_INTERNAL_SERVER_ERROR
-        );
+            default:
+                return new TypeException(
+                    "[{$e->getCode()}] - {$e->getMessage()}",
+                    $e,
+                    Response::HTTP_INTERNAL_SERVER_ERROR
+                );
+        }
     }
 
     /**
