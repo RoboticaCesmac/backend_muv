@@ -6,6 +6,7 @@ use App\Http\Requests\api\Auth\LoginRequest;
 use App\Http\Requests\api\Auth\RegisterRequest;
 use App\Services\JwtAuthService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
 class AuthController extends Controller
@@ -19,9 +20,11 @@ class AuthController extends Controller
         $this->middleware('auth:api', ['except' => ['login', 'register']]);
     }
 
-    public function login(LoginRequest $request): JsonResponse
+    public function login(Request $request): JsonResponse
     {
-        return response()->json($this->authService->login($request->all()), 200);
+        $credentials = $request->only('email', 'password');
+        
+        return response()->json($this->authService->login($credentials), 200);
     }
 
     /**
