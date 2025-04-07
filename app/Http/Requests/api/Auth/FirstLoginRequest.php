@@ -9,7 +9,7 @@ class FirstLoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'date_of_birth' => ['required', 'date'],
+            'date_of_birth' => ['required', 'date:format:Y-m-d'],
             'gender' => ['required', 'string', 'in:male,female'],
             'user_name' => ['required', 'string', 'max:25'],
             'vehicle_id' => ['required', 'exists:vehicles,id'],

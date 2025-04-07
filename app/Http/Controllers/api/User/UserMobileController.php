@@ -16,8 +16,8 @@ class UserMobileController extends Controller
 
     public function firstLogin(FirstLoginRequest $request, int $id): JsonResponse
     {
-        $this->userMobileService->firstLogin($request->validated(), $id);
+        $user = $this->userMobileService->firstLogin($request->validated(), $id);
 
-        return response()->json(['message' => 'Primeiro login realizado com sucesso']);
+        return response()->json(['message' => 'Primeiro login realizado com sucesso', 'data' => $user]);
     }
 }

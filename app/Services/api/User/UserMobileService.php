@@ -17,13 +17,13 @@ class UserMobileService
 
     public function firstLogin(array $data, int $id): User
     {
-        $user = JWTAuth::user();
+        $loggedUser = auth()->user();
 
-        if (!$user->is_first_login) {
+        if (!$loggedUser->isFirstLogin()) {
             throw new UserHasAlreadyLoggedInFirst('Usuário já realizou o primeiro login');
         }
 
-        $user->update([
+        $loggedUser->update([
             'date_of_birth' => $data['date_of_birth'],
             'gender' => $data['gender'],
             'user_name' => $data['user_name'],
@@ -31,6 +31,6 @@ class UserMobileService
             'is_first_login' => false,
         ]);
 
-        return $user;
+        return $loggedUser;
     }
 }

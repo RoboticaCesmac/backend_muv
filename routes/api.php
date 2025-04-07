@@ -4,7 +4,7 @@ use App\Http\Controllers\api\Auth\TokenController;
 use App\Http\Controllers\api\Auth\AuthController;
 use App\Http\Controllers\api\User\UserMobileController;
 use App\Http\Controllers\api\User\UserWebController;
-use App\Http\Controllers\api\Vehicle\VehicleController;
+use App\Http\Controllers\api\Vehicle\VehicleMobileController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -28,7 +28,7 @@ Route::prefix('v1')->group(function () {
 
         Route::prefix('mobile')->group(function () {
             Route::post('user/{id}/first-login', [UserMobileController::class, 'firstLogin']);
-            Route::get('vehicle', [VehicleController::class, 'all']);
+            Route::get('vehicle', [VehicleMobileController::class, 'all']);
         });
     });
 });

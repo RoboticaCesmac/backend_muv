@@ -24,6 +24,7 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => password_hash('teste', PASSWORD_BCRYPT),
             'is_admin' => false,
+            'is_first_login' => true,
         ];
     }
 
@@ -58,6 +59,12 @@ class UserFactory extends Factory
     public function statePassword(?string $password = null) {
         return $this->state(fn (array $attributes) => [
             'password' => $password ?? password_hash('teste', PASSWORD_BCRYPT),
+        ]);
+    }
+
+    public function stateIsFirstLogin(?bool $isFirstLogin = null) {
+        return $this->state(fn (array $attributes) => [
+            'is_first_login' => $isFirstLogin ?? true,
         ]);
     }
 }

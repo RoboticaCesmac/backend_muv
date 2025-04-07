@@ -10,6 +10,14 @@ class Vehicle extends Model
 {
     use HasFactory;
 
+    const VEHICLES = [
+        'gasoline_car' => 1,
+        'diesel_car' => 2,
+        'bicycle' => 3,
+        'walking' => 4,
+        'bus' => 5,
+    ];
+
     protected $fillable = [
         'name',
         'co2_per_km',

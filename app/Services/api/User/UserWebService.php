@@ -34,14 +34,18 @@ class UserWebService
 
     public function destroy(int $id): User
     {
-        $loggedUser = JWTAuth::user();
+        $loggedUser = auth()->user();
         
         $userDestroy = $this->user->where('id', $id)
             ->where('email', '!=', 'ADMIN')
-            ->firstOrFail();
+            ->first();
 
         if (!$loggedUser->is_admin) {
             throw new UserNotAdminException('Usuário não é administrador');
+        }
+
+        if (!$userDestroy) {
+            throw new UserNotFoundException('Usuário não encontrado');
         }
 
         $userDestroy->delete();

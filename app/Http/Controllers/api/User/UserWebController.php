@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\api\User;
 
-use App\Http\Resources\UserResource;
 use App\Services\api\User\UserWebService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;

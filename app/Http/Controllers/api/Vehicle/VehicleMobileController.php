@@ -5,7 +5,7 @@ namespace App\Http\Controllers\api\Vehicle;
 use App\Services\api\Vehicle\VehicleService;
 use Illuminate\Routing\Controller;
 
-class VehicleController extends Controller
+class VehicleMobileController extends Controller
 {
     private $vehicleService;
     
@@ -16,6 +16,8 @@ class VehicleController extends Controller
 
     public function all()
     {
-        return response()->json($this->vehicleService->all());
+        $vehicles = $this->vehicleService->all();
+
+        return response()->json($vehicles);
     }
 }

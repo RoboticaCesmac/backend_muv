@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('vehicles', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->decimal('co2_per_km', 10, 2);
+            $table->decimal('co2_per_km', 10, 4);
             $table->string('icon_path');
             $table->timestamps();
         });

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->foreignId('vehicle_id')->nullable();
             $table->string('gender')->nullable();
             $table->string('total_km')->nullable();
             $table->string('total_points')->nullable();
