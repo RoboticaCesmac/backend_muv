@@ -32,7 +32,7 @@ class AuthController extends Controller
      */
     public function loginMobile(LoginRequest $request): JsonResponse
     {
-        return response()->json($this->authService->loginMobile($request->all()), 200);
+        return response()->json($this->authService->loginMobile($request->validated()), 200);
     }
 
     /**
@@ -40,7 +40,9 @@ class AuthController extends Controller
      */
     public function register(RegisterRequest $request): JsonResponse
     {
-        return response()->json($this->authService->register($request->all()), 201);
+        $this->authService->register($request->validated());
+
+        return response()->json(['message' => 'Usuário registrado com sucesso'], 201);
     }
 
     /**

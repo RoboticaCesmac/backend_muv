@@ -6,6 +6,7 @@ use App\Exceptions\Token\TokenNotFoundException;
 use App\Exceptions\User\UserNotAdminException;
 use App\Models\Token;
 use App\Models\User;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Validation\ValidationException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -55,11 +56,11 @@ class JwtAuthService
      * @param array $data
      * @return array
      */
-    public function register(array $data): array
+    public function register(array $data): User
     {
         $token = Token::find($data['email']);
 
-        if (!$token || $token->token !== encrypt($data['token'])) {
+        if (!$token || $data['token'] !== Crypt::decryptString($token->token)) {
             throw new TokenNotFoundException('O token fornecido é inválido.');
         }
 
@@ -73,9 +74,7 @@ class JwtAuthService
             'email_verified_at' => now(),
         ]); 
 
-        $token = JWTAuth::fromUser($user);
-
-        return $this->respondWithToken($token);
+        return $user;
     }
 
     /**

@@ -7,6 +7,7 @@ use App\Models\Token;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Crypt;
 
 class TokenService
 {
@@ -17,7 +18,7 @@ class TokenService
         $tokenObject = Token::updateOrCreate([
             'email' => $request->get('email'),
         ], [
-            'token' => encrypt($token),
+            'token' => Crypt::encryptString($token),
             'expires_at' => now()->addHours(),
         ]);
 
