@@ -14,7 +14,7 @@ class SendTokenRequest extends FormRequest
     public function rules()
     {
         return [
-            'email' => 'required|email|not_exists:users,email',
+            'email' => 'required|email|unique:users,email',
         ];
     }
 
@@ -23,7 +23,7 @@ class SendTokenRequest extends FormRequest
         return [
             'email.required' => 'O email é obrigatório',
             'email.email' => 'O email é inválido',
-            'email.not_exists' => 'O email já está cadastrado',
+            'email.unique' => 'O email já está cadastrado',
         ];
     }
 }
