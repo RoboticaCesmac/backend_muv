@@ -17,7 +17,7 @@ class AuthController extends Controller
     public function __construct(
         protected JwtAuthService $authService
     ) {
-        $this->middleware('auth:api', ['except' => ['login', 'register']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register', 'loginMobile']]);
     }
 
     public function login(Request $request): JsonResponse
