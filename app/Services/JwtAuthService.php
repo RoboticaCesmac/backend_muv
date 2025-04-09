@@ -68,7 +68,6 @@ class JwtAuthService
         }
 
         $user = User::create([
-            'user_name' => $data['user_name'],
             'email' => $data['email'],
             'password' => password_hash($data['password'], PASSWORD_BCRYPT),
             'email_verified_at' => now(),
