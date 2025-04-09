@@ -23,11 +23,11 @@ class JwtAuthService
 
         $user = JWTAuth::user();
 
-        if (!$user->is_admin) {
+        if (!$user || !$user->is_admin) {
             throw new UserNotAdminException('Você não tem permissão para acessar esta aplicação.');
         }
 
-        return array_merge($this->respondWithToken($token));
+        return $this->respondWithToken($token);
     }
 
     /**
@@ -54,7 +54,7 @@ class JwtAuthService
      * Register a new user and return a JWT token.
      *
      * @param array $data
-     * @return array
+     * @return User
      */
     public function register(array $data): User
     {
