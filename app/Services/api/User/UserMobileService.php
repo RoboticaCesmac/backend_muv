@@ -2,9 +2,12 @@
 
 namespace App\Services\api\User;
 
+use App\Exceptions\Token\TokenNotFoundException;
 use App\Exceptions\User\UserHasAlreadyLoggedInFirst;
+use App\Exceptions\User\UserNotFoundException;
+use App\Models\Token;
 use App\Models\User;
-use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Crypt;
 
 class UserMobileService
 {
@@ -15,7 +18,7 @@ class UserMobileService
         $this->user = $user;
     }
 
-    public function firstLogin(array $data, int $id): User
+    public function firstLogin(array $data): User
     {
         $loggedUser = auth()->user();
 
@@ -32,5 +35,30 @@ class UserMobileService
         ]);
 
         return $loggedUser;
+    }
+
+    public function resetPassword(array $data): User
+    {
+        $user = $this->user->where('email', $data['email'])->first();
+        
+        if (!$user) {
+            throw new UserNotFoundException('Usuário não encontrado');
+        }
+
+        $token = Token::find($data['email']);
+
+        if (!$token || $data['token'] !== Crypt::decryptString($token->token)) {
+            throw new TokenNotFoundException('O token fornecido é inválido.');
+        }
+
+        if ($token->isExpired()) {
+            throw new TokenNotFoundException('O token fornecido já está expirado.');
+        }
+
+        $user->update([
+            'password' => password_hash($data['password'], PASSWORD_BCRYPT),
+        ]);
+
+        return $user;
     }
 }

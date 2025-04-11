@@ -13,6 +13,7 @@ Route::prefix('v1')->group(function () {
         Route::post('login-mobile', [AuthController::class, 'loginMobile']);
         Route::post('register', [AuthController::class, 'register']);
         Route::post('send-token', [TokenController::class, 'sendToken']);
+        Route::post('reset-password', [UserMobileController::class, 'resetPassword']);
     });
 
     Route::middleware('auth:api')->group(function () {
@@ -27,7 +28,7 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::prefix('mobile')->group(function () {
-            Route::post('user/{id}/first-login', [UserMobileController::class, 'firstLogin']);
+            Route::post('user/first-login', [UserMobileController::class, 'firstLogin']);
             Route::get('vehicle', [VehicleMobileController::class, 'all']);
         });
     });
