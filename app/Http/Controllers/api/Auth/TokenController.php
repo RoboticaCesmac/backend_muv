@@ -23,11 +23,4 @@ class TokenController extends Controller
 
         return response()->json(['message' => 'Token enviado com sucesso']);
     }
-
-    public function resetPassword(ResetPasswordRequest $request): JsonResponse
-    {
-        $this->tokenService->resetPassword($request);
-
-        return response()->json(['message' => 'Senha alterada com sucesso']);
-    }
 }
