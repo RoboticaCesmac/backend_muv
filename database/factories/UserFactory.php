@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Hash;
 
 class UserFactory extends Factory
 {
@@ -22,7 +23,7 @@ class UserFactory extends Factory
             'user_name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
-            'password' => password_hash('teste', PASSWORD_BCRYPT),
+            'password' => Hash::make('teste'),
             'is_admin' => false,
             'is_first_login' => true,
         ];
@@ -58,7 +59,7 @@ class UserFactory extends Factory
 
     public function statePassword(?string $password = null) {
         return $this->state(fn (array $attributes) => [
-            'password' => $password ?? password_hash('teste', PASSWORD_BCRYPT),
+            'password' => Hash::make($password ?? 'teste'),
         ]);
     }
 

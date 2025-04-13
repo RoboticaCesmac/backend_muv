@@ -7,6 +7,7 @@ use App\Exceptions\User\UserNotAdminException;
 use App\Models\Token;
 use App\Models\User;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -70,7 +71,7 @@ class JwtAuthService
 
         $user = User::create([
             'email' => $data['email'],
-            'password' => password_hash($data['password'], PASSWORD_BCRYPT),
+            'password' => Hash::make($data['password']),
             'email_verified_at' => now(),
         ]); 
 

@@ -59,9 +59,9 @@ trait ApiExceptionHandler
 
             default:
                 return new TypeException(
-                    'Ocorreu um erro inesperado.',
+                    "[{$e->getCode()}] - {$e->getMessage()}",
                     $e,
-                    Response::HTTP_INTERNAL_SERVER_ERROR
+                    Response::HTTP_NOT_IMPLEMENTED
                 );
         }
     }

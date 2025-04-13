@@ -8,6 +8,7 @@ use App\Exceptions\User\UserNotFoundException;
 use App\Models\Token;
 use App\Models\User;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Hash;
 
 class UserMobileService
 {
@@ -39,24 +40,24 @@ class UserMobileService
 
     public function resetPassword(array $data): User
     {
-        $user = $this->user->where('email', $data['email'])->first();
+        $user = User::where('email', $data['email'])->first();
         
         if (!$user) {
             throw new UserNotFoundException('Usuário não encontrado');
         }
 
         $token = Token::find($data['email']);
-
+        
         if (!$token || $data['token'] !== Crypt::decryptString($token->token)) {
             throw new TokenNotFoundException('O token fornecido é inválido.');
         }
-
+        
         if ($token->isExpired()) {
             throw new TokenNotFoundException('O token fornecido já está expirado.');
         }
-
+        
         $user->update([
-            'password' => password_hash($data['password'], PASSWORD_BCRYPT),
+            'password' => Hash::make($data['password']),
         ]);
 
         return $user;

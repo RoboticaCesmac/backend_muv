@@ -8,11 +8,20 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use Illuminate\Support\Facades\Log;
 
 trait InertiaExceptionHandler
 {
     protected function handleInertiaException(Request $request, \Throwable $e)
     {
+        Log::error('Inertia Exception Handler', [
+            'exception' => get_class($e),
+            'message' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'trace' => $e->getTraceAsString()
+        ]);
+
         switch (true) {
             case $e instanceof ValidationException:
                 return back()->withErrors($e->errors());
