@@ -43,7 +43,7 @@ class LoginController extends Controller
                     60 * 24, // 24 horas
                     '/',     // path
                     null,    // domain
-                    true,    // secure
+                    false,   // secure - definido como false para funcionar com HTTP
                     true,    // httpOnly
                     false,   // raw
                     'Lax'    // sameSite
