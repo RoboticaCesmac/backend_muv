@@ -13,9 +13,13 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Illuminate\Contracts\Encryption\DecryptException;
+use App\Traits\ApiExceptionHandler;
+use App\Traits\InertiaExceptionHandler;
 
 class Handler extends ExceptionHandler
 {
+    use ApiExceptionHandler, InertiaExceptionHandler;
+
     /**
      * A list of the exception types that are not reported.
      *
@@ -130,7 +134,15 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $e): Response
     {
-        $typeException = $this->handleException($request, $e);
-        return response()->json($typeException->toArray(), $typeException->statusCode);
+        if ($request->is('api/*')) {
+            $typeException = $this->handleApiException($request, $e);
+            return response()->json($typeException->toArray(), $typeException->statusCode);
+        }
+
+        if ($request->header('X-Inertia')) {
+            return $this->handleInertiaException($request, $e);
+        }
+
+        return parent::render($request, $e);
     }
 } 

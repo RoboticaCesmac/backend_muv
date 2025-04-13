@@ -11,10 +11,8 @@ Route::get('/', function () {
 
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 
-
-// Rotas protegidas
 Route::middleware(['jwt.auth'])->group(function () {
-    // Dashboard e Home apontam para a mesma página
+
     Route::get('/home', function () {
         return Inertia::render('Home');
     })->name('home');

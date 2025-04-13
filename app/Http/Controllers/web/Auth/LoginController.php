@@ -8,6 +8,7 @@ use Inertia\Inertia;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Cookie;
 
 class LoginController extends Controller
 {
@@ -29,11 +30,29 @@ class LoginController extends Controller
             ]);
 
             if (Auth::attempt($request->only('email', 'password'))) {
+                // Configura o tempo de expiração do token
+                JWTAuth::factory()->setTTL(60 * 24); // 24 horas
+                
+                // Gera o token JWT
                 $token = JWTAuth::fromUser(Auth::user());
                 
-                $cookie = cookie('auth_token', $token, 60 * 24, null, null, true, true);
-                
-                return Inertia::location(route('home'))->withCookie($cookie);
+                // Cria o cookie com o token
+                $cookie = Cookie::make(
+                    'auth_token',
+                    $token,
+                    60 * 24, // 24 horas
+                    null,    // path
+                    null,    // domain
+                    true,    // secure
+                    true,    // httpOnly
+                    false,   // raw
+                    'Lax'    // sameSite
+                );
+
+                // Redireciona para home com o cookie
+                return redirect()
+                    ->route('home')
+                    ->withCookie($cookie);
             }
             
             return back()->withErrors([
