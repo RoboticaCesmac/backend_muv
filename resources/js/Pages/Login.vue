@@ -2,7 +2,7 @@
   <div class="login-background">
     <div class="login-container">
       <div class="login-logo">
-        <img src="../../../public/images/LogoMarcaCortada.png" alt="logo">
+        <img src="/images/LogoMarcaCortada.png" alt="logo">
       </div>
       <h1 class="login-title">Acesse sua conta</h1>
       <form class="login-form" @submit.prevent="submit">
