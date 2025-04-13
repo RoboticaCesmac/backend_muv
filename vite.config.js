@@ -20,6 +20,20 @@ export default defineConfig({
     resolve: {
         alias: {
             '@': '/resources/js',
+            '~': '/resources',
+        },
+    },
+    build: {
+        assetsDir: 'assets',
+        rollupOptions: {
+            output: {
+                assetFileNames: (assetInfo) => {
+                    if (assetInfo.name.endsWith('.png') || assetInfo.name.endsWith('.jpg') || assetInfo.name.endsWith('.jpeg')) {
+                        return 'assets/[name]-[hash][extname]';
+                    }
+                    return 'assets/[name]-[hash][extname]';
+                },
+            },
         },
     },
 });
