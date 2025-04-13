@@ -14,6 +14,7 @@ class HandleJwtAuth
     protected $except = [
         '/',
         'login',
+        'login.post',
     ];
 
     public function handle(Request $request, Closure $next)

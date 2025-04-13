@@ -41,7 +41,7 @@ class LoginController extends Controller
                     'auth_token',
                     $token,
                     60 * 24, // 24 horas
-                    null,    // path
+                    '/',     // path
                     null,    // domain
                     true,    // secure
                     true,    // httpOnly
