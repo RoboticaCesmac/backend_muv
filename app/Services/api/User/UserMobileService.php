@@ -2,12 +2,9 @@
 
 namespace App\Services\api\User;
 
-use App\Exceptions\Token\TokenNotFoundException;
 use App\Exceptions\User\UserHasAlreadyLoggedInFirst;
 use App\Exceptions\User\UserNotFoundException;
-use App\Models\Token;
 use App\Models\User;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
 
 class UserMobileService
@@ -44,16 +41,6 @@ class UserMobileService
         
         if (!$user) {
             throw new UserNotFoundException('Usuário não encontrado');
-        }
-
-        $token = Token::find($data['email']);
-        
-        if (!$token || $data['token'] !== Crypt::decryptString($token->token)) {
-            throw new TokenNotFoundException('O token fornecido é inválido.');
-        }
-        
-        if ($token->isExpired()) {
-            throw new TokenNotFoundException('O token fornecido já está expirado.');
         }
         
         $user->update([

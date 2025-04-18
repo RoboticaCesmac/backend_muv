@@ -13,6 +13,7 @@ Route::prefix('v1')->group(function () {
         Route::post('login-mobile', [AuthController::class, 'loginMobile']);
         Route::post('register', [AuthController::class, 'register']);
         Route::post('send-token', [TokenController::class, 'sendToken']);
+        Route::post('confirm-token', [TokenController::class, 'confirmToken']);
         Route::post('reset-password', [UserMobileController::class, 'resetPassword']);
     });
 
