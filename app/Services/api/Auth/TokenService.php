@@ -15,7 +15,7 @@ use Carbon\Carbon;
 
 class TokenService
 {
-    public function sendToken(Request $request): Token
+    public function sendRegisterToken(Request $request): Token
     {
         $token = Str::padLeft(random_int(0, 999999), 6, '0');
 
@@ -36,6 +36,27 @@ class TokenService
         return $tokenObject;
     }
 
+    public function sendResetPasswordToken(Request $request): Token
+    {
+        $token = Str::padLeft(random_int(0, 999999), 6, '0');
+
+        $tokenObject = Token::updateOrCreate([
+            'email' => $request->get('email'),
+        ], [
+            'token' => Crypt::encryptString($token),
+            'expires_at' => now()->addHours(),
+        ]);
+
+        Mail::to($request->get('email'))
+            ->send(new TokenMail(
+                token: $token,
+                name: $request->get('email'),
+                expiresInMinutes: 60
+            ));
+
+        return $tokenObject;
+    }
+
     /**
      * Confirma se um token é válido para um determinado email
      * Lança exceções em caso de erros
@@ -46,7 +67,7 @@ class TokenService
      * @throws TokenExpiredException
      * @throws InvalidTokenException
      */
-    public function confirmToken(array $data): void
+    public function confirmResetPasswordToken(array $data): void
     {
         $tokenRecord = Token::where('email', $data['email'])->first();
 

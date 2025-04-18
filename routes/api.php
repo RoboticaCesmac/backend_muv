@@ -12,8 +12,9 @@ Route::prefix('v1')->group(function () {
         Route::post('login', [AuthController::class, 'login']);
         Route::post('login-mobile', [AuthController::class, 'loginMobile']);
         Route::post('register', [AuthController::class, 'register']);
-        Route::post('send-token', [TokenController::class, 'sendToken']);
-        Route::post('confirm-token', [TokenController::class, 'confirmToken']);
+        Route::post('send-register-token', [TokenController::class, 'sendRegisterToken']);
+        Route::post('send-reset-password-token', [TokenController::class, 'sendResetPasswordToken']);
+        Route::post('confirm-reset-password-token', [TokenController::class, 'confirmResetPasswordToken']);
         Route::post('reset-password', [UserMobileController::class, 'resetPassword']);
     });
 

@@ -4,7 +4,7 @@ namespace App\Http\Requests\api\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class SendTokenRequest extends FormRequest
+class SendRegisterTokenRequest extends FormRequest
 {
     public function authorize()
     {
