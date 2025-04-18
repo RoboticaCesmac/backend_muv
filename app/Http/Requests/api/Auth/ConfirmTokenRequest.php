@@ -24,4 +24,14 @@ class ConfirmTokenRequest extends FormRequest
             'token' => 'required|string',
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'email.required' => 'O email é obrigatório',
+            'email.email' => 'O email é inválido',
+            'token.required' => 'O token é obrigatório',
+            'token.string' => 'O token deve ser uma string',
+        ];
+    }   
 } 
