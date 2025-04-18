@@ -65,8 +65,9 @@ const page = usePage();
 const isCollapsed = ref(false);
 
 const menuItems = [
-  { name: 'Dashboard', path: '/home', icon: 'fa-solid fa-gauge-high' },
-  { name: 'Projetos', path: '/projects', icon: 'fa-solid fa-diagram-project' },
+  { name: 'Usuários', path: '/home', icon: 'fa-solid fa-users' },
+  { name: 'Veículos', path: '/vehicles', icon: 'fa-solid fa-car' },
+  { name: 'Níveis', path: '/levels', icon: 'fa-solid fa-trophy' },
   { name: 'Relatórios', path: '/reports', icon: 'fa-solid fa-chart-line' },
   { name: 'Configurações', path: '/settings', icon: 'fa-solid fa-gear' }
 ];

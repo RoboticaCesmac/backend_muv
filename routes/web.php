@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\web\Auth\LoginController;
+use App\Http\Controllers\web\UserController;
+use App\Http\Controllers\web\UserLevelController;
+use App\Http\Controllers\web\VehicleController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -13,9 +16,10 @@ Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 
 Route::middleware(['jwt.auth'])->group(function () {
 
-    Route::get('/home', function () {
-        return Inertia::render('Home');
-    })->name('home');
+    Route::get('/home', [UserController::class, 'index'])->name('home');
+    Route::get('/users/search', [UserController::class, 'search'])->name('users.search');
+    Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+    Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
 
     Route::get('/dashboard', function () {
         return Inertia::render('Home', [
@@ -24,11 +28,11 @@ Route::middleware(['jwt.auth'])->group(function () {
         ]);
     })->name('dashboard');
 
-    Route::get('/projects', function () {
-        return Inertia::render('Projects', [
-            'title' => 'Projetos'
-        ]);
-    })->name('projects');
+    Route::get('/vehicles', [VehicleController::class, 'index'])->name('vehicles');
+    Route::put('/vehicles/{vehicle}', [VehicleController::class, 'update'])->name('vehicles.update');
+
+    Route::get('/levels', [UserLevelController::class, 'index'])->name('levels');
+    Route::put('/levels/{level}', [UserLevelController::class, 'update'])->name('levels.update');
 
     Route::get('/reports', function () {
         return Inertia::render('Reports', [

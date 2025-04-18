@@ -26,6 +26,8 @@ class UserFactory extends Factory
             'password' => Hash::make('teste'),
             'is_admin' => false,
             'is_first_login' => true,
+            'total_km' => 0,
+            'total_points' => 0,
         ];
     }
 

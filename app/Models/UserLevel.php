@@ -6,21 +6,22 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class RouteStatus extends Model
+class UserLevel extends Model
 {
     use HasFactory;
 
-    protected $table = 'route_statuses';
-
     protected $fillable = [
-        'description',
+        'level_number',
+        'points_required',
+        'icon_path',
+        'is_default'
     ];
-
+    
     /**
-     * Get the routes with this status.
+     * Get users with this level.
      */
-    public function routes(): HasMany
+    public function users(): HasMany
     {
-        return $this->hasMany(Route::class);
+        return $this->hasMany(User::class);
     }
-} 
+}

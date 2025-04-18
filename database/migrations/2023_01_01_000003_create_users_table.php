@@ -17,14 +17,15 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->foreignId('vehicle_id')->nullable();
+            $table->foreignId('vehicle_id')->nullable()->constrained('vehicles');
             $table->string('gender')->nullable();
-            $table->string('total_km')->nullable();
-            $table->string('total_points')->nullable();
-            $table->string('date_of_birth')->nullable();
+            $table->decimal('total_km', 10, 2)->nullable();
+            $table->integer('total_points')->nullable();
+            $table->date('date_of_birth')->nullable();
             $table->boolean('is_admin')->default(false);
             $table->boolean('is_first_login')->default(false);
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('sessions', function (Blueprint $table) {
@@ -42,7 +43,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
         Schema::dropIfExists('sessions');
+        Schema::dropIfExists('users');
     }
-};
+}; 

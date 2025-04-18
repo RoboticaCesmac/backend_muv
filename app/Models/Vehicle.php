@@ -22,10 +22,12 @@ class Vehicle extends Model
         'name',
         'co2_per_km',
         'icon_path',
+        'points_per_km',
     ];
 
     protected $casts = [
         'co2_per_km' => 'float',
+        'points_per_km' => 'float',
     ];
 
     /**

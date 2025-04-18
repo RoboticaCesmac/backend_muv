@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->decimal('co2_per_km', 10, 4);
             $table->string('icon_path');
+            $table->decimal('points_per_km', 3, 1);
             $table->timestamps();
         });
     }
@@ -27,4 +28,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('vehicles');
     }
-};
+}; 

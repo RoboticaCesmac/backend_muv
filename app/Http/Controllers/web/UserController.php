@@ -1,0 +1,91 @@
+<?php
+
+namespace App\Http\Controllers\web;
+
+use Illuminate\Routing\Controller;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Illuminate\Support\Facades\Hash;
+
+class UserController extends Controller
+{
+    /**
+     * Exibe a página de listagem de usuários
+     */
+    public function index(Request $request)
+    {
+        $perPage = $request->input('per_page', 10);
+        
+        // Excluir o usuário de ID 1 da listagem
+        $users = User::where('id', '!=', 1)->paginate($perPage);
+        
+        return Inertia::render('Home', [
+            'users' => $users
+        ]);
+    }
+
+    /**
+     * Busca usuários com filtro
+     */
+    public function search(Request $request)
+    {
+        $query = User::query()->where('id', '!=', 1);
+        $perPage = $request->input('per_page', 10);
+
+        if ($request->has('search') && !empty($request->search)) {
+            $searchTerm = $request->search;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('email', 'like', "%{$searchTerm}%")
+                  ->orWhere('user_name', 'like', "%{$searchTerm}%");
+            });
+        }
+
+        // Retorna resultados paginados
+        $users = $query->paginate($perPage);
+
+        return response()->json($users);
+    }
+
+    /**
+     * Atualiza os dados de um usuário
+     */
+    public function update(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'user_name' => 'nullable|string|max:255',
+            'email' => 'required|email|unique:users,email,'.$user->id,
+            'password' => 'nullable|string|min:6',
+        ]);
+
+        // Atualizar dados básicos
+        $user->user_name = $validated['user_name'] ?? $user->user_name;
+        $user->email = $validated['email'];
+        
+        // Atualizar senha apenas se foi fornecida
+        if (!empty($validated['password'])) {
+            $user->password = Hash::make($validated['password']);
+        }
+        
+        $user->save();
+
+        return response()->json([
+            'message' => 'Usuário atualizado com sucesso',
+            'user' => $user
+        ]);
+    }
+
+    /**
+     * Remove um usuário
+     */
+    public function destroy(User $user)
+    {
+        if ($user->id === 1) {
+            return response()->json(['message' => 'Este usuário não pode ser excluído'], 403);
+        }
+        
+        $user->delete();
+
+        return response()->json(['message' => 'Usuário excluído com sucesso']);
+    }
+} 

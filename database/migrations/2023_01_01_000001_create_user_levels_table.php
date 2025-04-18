@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('route_status', function (Blueprint $table) {
+        Schema::create('user_levels', function (Blueprint $table) {
             $table->id();
-            $table->string('descricao');
+            $table->integer('level_number');
+            $table->integer('points_required');
+            $table->string('icon_path');
+            $table->boolean('is_default')->default(false);
             $table->timestamps();
         });
     }
@@ -23,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('route_status');
+        Schema::dropIfExists('user_levels');
     }
-};
+}; 

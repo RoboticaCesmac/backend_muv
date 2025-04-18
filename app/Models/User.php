@@ -3,17 +3,19 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasOne; // Changed from BelongsTo to HasOne
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject as JWTSubjectContract;
-use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Auth;
 
 class User extends Authenticatable implements JWTSubjectContract
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -55,11 +57,25 @@ class User extends Authenticatable implements JWTSubjectContract
         'date_of_birth' => 'date',
         'is_first_login' => 'boolean',
         'vehicle_id' => 'integer',
+        'user_level_id' => 'integer',
+        'total_km' => 'decimal:2',
+        'total_points' => 'integer',
     ];
 
-    public function vehicle(): HasOne // Updated method to use HasOne
+    /**
+     * Get the vehicle that belongs to user.
+     */
+    public function vehicle(): BelongsTo
     {
-        return $this->hasOne(Vehicle::class); // Updated to use hasOne relationship
+        return $this->belongsTo(Vehicle::class);
+    }
+
+    /**
+     * Get the routes associated with the user.
+     */
+    public function routes(): HasMany
+    {
+        return $this->hasMany(Route::class);
     }
 
     /**
@@ -117,27 +133,47 @@ class User extends Authenticatable implements JWTSubjectContract
             ->where('expires_at', '>', now());
     }
 
+    /**
+     * Check if the logged in user can edit this user
+     *
+     * @return bool
+     */
     public function canEdit(): bool
     {
-        $loggedUser = auth()->user();
+        $loggedUser = Auth::user();
         
-        return $loggedUser->is_admin;
+        return $loggedUser && $loggedUser->is_admin;
     }
 
+    /**
+     * Check if the logged in user can delete this user
+     *
+     * @return bool
+     */
     public function canDelete(): bool
     {
-        $loggedUser = auth()->user();
+        $loggedUser = Auth::user();
 
-        return $loggedUser->is_admin;
+        return $loggedUser && $loggedUser->is_admin;
     }
 
+    /**
+     * Check if the logged in user can update this user
+     *
+     * @return bool
+     */
     public function canUpdate(): bool
     {
-        $loggedUser = auth()->user();
+        $loggedUser = Auth::user();
 
-        return $loggedUser->is_admin;
+        return $loggedUser && $loggedUser->is_admin;
     }
 
+    /**
+     * Check if this is the user's first login
+     *
+     * @return bool
+     */
     public function isFirstLogin(): bool
     {
         return $this->is_first_login;
