@@ -33,6 +33,7 @@ class User extends Authenticatable implements JWTSubjectContract
         'is_first_login',
         'email_verified_at',
         'vehicle_id',
+        'avatar_id',
     ];
 
     /**
@@ -61,6 +62,11 @@ class User extends Authenticatable implements JWTSubjectContract
         'total_km' => 'decimal:2',
         'total_points' => 'integer',
     ];
+
+    public function avatar(): BelongsTo
+    {
+        return $this->belongsTo(UserAvatar::class);
+    }
 
     /**
      * Get the vehicle that belongs to user.

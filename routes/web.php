@@ -4,6 +4,7 @@ use App\Http\Controllers\web\Auth\LoginController;
 use App\Http\Controllers\web\UserController;
 use App\Http\Controllers\web\UserLevelController;
 use App\Http\Controllers\web\VehicleController;
+use App\Http\Controllers\web\AvatarController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -34,15 +35,7 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::get('/levels', [UserLevelController::class, 'index'])->name('levels');
     Route::put('/levels/{level}', [UserLevelController::class, 'update'])->name('levels.update');
 
-    Route::get('/reports', function () {
-        return Inertia::render('Reports', [
-            'title' => 'Relatórios'
-        ]);
-    })->name('reports');
-
-    Route::get('/settings', function () {
-        return Inertia::render('Settings', [
-            'title' => 'Configurações'
-        ]);
-    })->name('settings');
+    Route::get('/avatars', [AvatarController::class, 'index'])->name('avatars');
+    Route::post('/avatars', [AvatarController::class, 'store'])->name('avatars.store');
+    Route::delete('/avatars/{avatar}', [AvatarController::class, 'destroy'])->name('avatars.destroy');
 });
