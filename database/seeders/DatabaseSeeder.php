@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             UserLevelSeeder::class,
             VehicleSeeder::class,
             UserSeeder::class,
+            RouteStatusSeeder::class,
         ]);
     }
 }

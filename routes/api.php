@@ -35,7 +35,6 @@ Route::prefix('v1')->group(function () {
             Route::get('vehicle', [VehicleMobileController::class, 'all']);
         });
 
-        // Vehicle routes for web interface
         Route::get('vehicles', [VehicleController::class, 'index']);
         Route::put('vehicles/{id}', [VehicleController::class, 'update']);
     });
