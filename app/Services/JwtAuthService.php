@@ -40,6 +40,9 @@ class JwtAuthService
      */
     public function loginMobile(array $credentials): array
     {
+        // Configurar um TTL extremamente longo para dispositivos móveis (1 ano)
+        JWTAuth::factory()->setTTL(env('JWT_MOBILE_TTL', 525600)); // 1 ano por padrão, configurável por env
+        
         if (!$token = JWTAuth::attempt($credentials)) {
             throw ValidationException::withMessages([
                 'email' => ['As credenciais fornecidas estão incorretas.'],
@@ -47,6 +50,10 @@ class JwtAuthService
         }
 
         $user = JWTAuth::user();
+
+        // Adicionar claim para identificar que é um token mobile
+        $customClaims = ['mobile' => true];
+        $token = JWTAuth::claims($customClaims)->fromUser($user);
 
         return array_merge($this->respondWithToken($token), ['is_first_login' => $user->is_first_login]);
     }
