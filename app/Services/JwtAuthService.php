@@ -85,7 +85,7 @@ class JwtAuthService
      */
     public function me(): User
     {
-        return JWTAuth::parseToken()->authenticate();
+        return JWTAuth::parseToken()->authenticate()->load(['vehicle', 'avatar']);
     }
 
     /**

@@ -184,4 +184,27 @@ class User extends Authenticatable implements JWTSubjectContract
     {
         return $this->is_first_login;
     }
+
+    public function getPerfilDataAttribute(): array
+    {
+        $routes = $this->routes()->get();
+
+        $totalPoints = $routes->sum('points') ?? 0;
+
+        $levels = UserLevel::orderBy('points_required', 'asc')->get();
+
+        $currentLevel = $levels->firstWhere('points_required', '<=', $totalPoints);
+
+        $nextLevel = $levels->firstWhere('points_required', '>', $totalPoints);
+
+        $distanceTraveled = $routes->sum('distance_km') ?? 0;
+
+        return [
+            'current_level' => $currentLevel->level_number,
+            'point_to_next_level' => $nextLevel ? $nextLevel->points_required - $totalPoints : 0,
+            'total_points' => $totalPoints,
+            'total_points_of_next_level' => $nextLevel ? $nextLevel->points_required : $currentLevel->points_required,
+            'distance_traveled' => $distanceTraveled,
+        ];
+    }
 }

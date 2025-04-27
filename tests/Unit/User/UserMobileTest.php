@@ -68,4 +68,28 @@ class UserMobileTest extends TestCase
             'message' => 'Senha alterada com sucesso',
         ]);
     }
+
+    public function test_me_with_user_in_first_login(): void
+    {
+        $user = UserFactory::new()->create();
+
+        $response = $this->jsonAsUser('GET', '/api/v1/auth/me', [], $user);
+
+        $response->assertStatus(200);
+
+        $response->assertJson([
+                'id' => $user->id,
+                'user_name' => $user->user_name,
+                'email' => $user->email,
+                'date_of_birth' => $user->date_of_birth,
+                'gender' => $user->gender,
+                'level_data' => [
+                    'current_level' => 1,
+                    'point_to_next_level' => 100,
+                    'total_points' => 0,
+                    'total_points_of_next_level' => 100,
+                ],
+            ],
+        );
+    }
 }

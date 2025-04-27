@@ -10,7 +10,7 @@ class FirstLoginRequest extends FormRequest
     {
         return [
             'date_of_birth' => ['required', 'date:format:Y-m-d'],
-            'gender' => ['required', 'string', 'in:male,female,other'],
+            'gender' => ['required', 'string', 'in:male,female,other'   ],
             'user_name' => ['required', 'string', 'max:25'],
             'vehicle_id' => ['required', 'exists:vehicles,id'],
             'avatar_id' => ['required', 'exists:user_avatars,id'],

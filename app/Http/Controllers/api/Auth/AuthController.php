@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api\Auth;
 
 use App\Http\Requests\api\Auth\LoginRequest;
 use App\Http\Requests\api\Auth\RegisterRequest;
+use App\Http\Resources\MobileUserResource;
 use App\Services\JwtAuthService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -50,7 +51,9 @@ class AuthController extends Controller
      */
     public function me(): JsonResponse
     {
-        return response()->json($this->authService->me());
+        $user = $this->authService->me();
+        
+        return response()->json(new MobileUserResource($user));
     }
 
     /**
