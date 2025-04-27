@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api\Vehicle;
 
 use App\Services\api\Vehicle\VehicleService;
 use Illuminate\Routing\Controller;
+use App\Http\Resources\Vehicle\VehicleUrlResource;
 
 class VehicleMobileController extends Controller
 {
@@ -18,6 +19,8 @@ class VehicleMobileController extends Controller
     {
         $vehicles = $this->vehicleService->all();
 
-        return response()->json($vehicles);
+        return response()->json([
+            'data' => VehicleUrlResource::collection($vehicles)
+        ]);
     }
 }

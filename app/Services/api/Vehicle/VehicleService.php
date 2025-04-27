@@ -3,19 +3,12 @@
 namespace App\Services\api\Vehicle;
 
 use App\Models\Vehicle;
+use Illuminate\Database\Eloquent\Collection;
 
 class VehicleService
 {
-    public function all()
+    public function all(): Collection
     {
-        return Vehicle::all()->map(function ($vehicle) {
-            $filePath = public_path($vehicle->icon_path);
-
-            $imageData = file_exists($filePath) ? base64_encode(file_get_contents($filePath)) : null;
-            
-            $vehicle->icon_base64 = $imageData ? 'data:image/png;base64,' . $imageData : null;
-
-            return $vehicle;
-        });
+        return Vehicle::all();
     }
 }

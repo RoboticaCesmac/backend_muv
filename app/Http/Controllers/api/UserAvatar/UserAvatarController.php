@@ -5,7 +5,7 @@ namespace App\Http\Controllers\api\UserAvatar;
 use Illuminate\Http\JsonResponse;
 use App\Services\api\UserAvatar\UserAvatarService;
 use Illuminate\Routing\Controller;
-
+use App\Http\Resources\UserAvatar\UserAvatarUrlResource;
 class UserAvatarController extends Controller
 {
     public function __construct(private UserAvatarService $userAvatarService)
@@ -17,6 +17,8 @@ class UserAvatarController extends Controller
     {
         $userAvatars = $this->userAvatarService->all();
 
-        return response()->json(['data' => $userAvatars]);
+        return response()->json([
+            'data' => UserAvatarUrlResource::collection($userAvatars)
+        ]);
     }
 }
