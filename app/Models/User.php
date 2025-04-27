@@ -11,6 +11,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject as JWTSubjectContract;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\URL;
 
 class User extends Authenticatable implements JWTSubjectContract
 {
@@ -205,6 +206,7 @@ class User extends Authenticatable implements JWTSubjectContract
             'total_points' => $totalPoints,
             'total_points_of_next_level' => $nextLevel ? $nextLevel->points_required : $currentLevel->points_required,
             'distance_traveled' => $distanceTraveled,
+            'current_level_icon' => URL::asset($currentLevel->icon_path),
         ];
     }
 }
