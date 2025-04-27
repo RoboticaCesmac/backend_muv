@@ -23,7 +23,7 @@ return new class extends Migration
             $table->integer('total_points')->nullable();
             $table->date('date_of_birth')->nullable();
             $table->boolean('is_admin')->default(false);
-            $table->boolean('is_first_login')->default(false);
+            $table->boolean('is_first_login')->default(true);
             $table->foreignId('avatar_id')->nullable()->constrained('user_avatars');
             $table->timestamps();
             $table->softDeletes();
