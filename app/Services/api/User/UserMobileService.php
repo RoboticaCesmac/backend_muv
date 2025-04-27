@@ -20,7 +20,7 @@ class UserMobileService
     {
         $loggedUser = auth()->user();
 
-        if (!$loggedUser->isFirstLogin()) {
+        if (! $loggedUser->isFirstLogin()) {
             throw new UserHasAlreadyLoggedInFirst('Usuário já realizou o primeiro login');
         }
 
@@ -30,6 +30,7 @@ class UserMobileService
             'user_name' => $data['user_name'],
             'vehicle_id' => $data['vehicle_id'],
             'is_first_login' => false,
+            'avatar_id' => $data['avatar_id'],
         ]);
 
         return $loggedUser;

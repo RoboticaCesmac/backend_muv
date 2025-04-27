@@ -6,6 +6,7 @@ use App\Http\Controllers\api\User\UserMobileController;
 use App\Http\Controllers\api\User\UserWebController;
 use App\Http\Controllers\api\Vehicle\VehicleMobileController;
 use App\Http\Controllers\api\Vehicle\VehicleController;
+use App\Http\Controllers\api\UserAvatar\UserAvatarController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -33,6 +34,7 @@ Route::prefix('v1')->group(function () {
         Route::prefix('mobile')->group(function () {
             Route::post('user/first-login', [UserMobileController::class, 'firstLogin']);
             Route::get('vehicle', [VehicleMobileController::class, 'all']);
+            Route::get('user-avatar', [UserAvatarController::class, 'all']);
         });
 
         Route::get('vehicles', [VehicleController::class, 'index']);

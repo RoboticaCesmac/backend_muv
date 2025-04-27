@@ -6,7 +6,6 @@ use App\Exceptions\User\UserNotAdminException;
 use App\Exceptions\User\UserNotFoundException;
 use App\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class UserWebService
 {
