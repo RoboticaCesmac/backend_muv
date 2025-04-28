@@ -14,6 +14,16 @@ class UserSeeder extends Seeder
             ->statePassword('ADMIN')
             ->stateIsAdmin(true)
             ->stateUserName('Admin')
-            ->create();    
+            ->create();
+
+        UserFactory::new()
+            ->stateEmail('gustavo.barrel44@gmail.com')
+            ->statePassword('21213300')
+            ->stateUserName('Gustavo')
+            ->stateVehicleId(2)
+            ->stateAvatar(2)
+            ->stateIsFirstLogin(false)
+            ->stateRouteFinalizada()
+            ->create();
     }
 }

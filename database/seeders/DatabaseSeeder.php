@@ -15,8 +15,8 @@ class DatabaseSeeder extends Seeder
             UserAvatarSeeder::class,
             UserLevelSeeder::class,
             VehicleSeeder::class,
-            UserSeeder::class,
             RouteStatusSeeder::class,
+            UserSeeder::class,
         ]);
     }
 }
