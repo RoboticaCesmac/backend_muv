@@ -11,6 +11,10 @@ class Route extends Model
 {
     use HasFactory;
 
+    protected $table = 'routes';
+
+    protected $primaryKey = 'id';
+
     protected $fillable = [
         'user_id',
         'route_status_id',
@@ -25,8 +29,8 @@ class Route extends Model
     protected $casts = [
         'co2_produced' => 'float',
         'distance_km' => 'float',
-        'started_at' => 'datetime',
-        'ended_at' => 'datetime',
+        'started_at' => 'datetime:Y-m-d H:i:s',
+        'ended_at' => 'datetime:Y-m-d H:i:s',
     ];
 
     /**

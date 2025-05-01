@@ -13,6 +13,8 @@ class RouteStatus extends Model
 
     protected $table = 'route_status';
 
+    protected $primaryKey = 'id';
+
     protected $fillable = [
         'description',
     ];

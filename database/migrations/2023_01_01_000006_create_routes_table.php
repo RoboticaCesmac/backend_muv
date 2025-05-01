@@ -16,11 +16,11 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('route_status_id')->constrained('route_status')->onDelete('cascade');
             $table->foreignId('vehicle_id')->constrained('vehicles')->onDelete('cascade');
-            $table->integer('points')->nullable();
+            $table->decimal('points', 10, 2)->nullable();
             $table->decimal('co2_produced', 10, 2)->nullable();
             $table->decimal('distance_km', 10, 2)->nullable();
-            $table->timestamp('started_at')->nullable();
-            $table->timestamp('ended_at')->nullable();
+            $table->datetime('started_at')->nullable();
+            $table->datetime('ended_at')->nullable();
             $table->timestamps();
         });
     }

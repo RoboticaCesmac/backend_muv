@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Enums\RouteStatusEnum;
+use App\Models\Vehicle;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class RouteFactory extends Factory
@@ -10,8 +12,8 @@ class RouteFactory extends Factory
     {
         return [
             'user_id' => UserFactory::new()->create()->id,
-            'route_status_id' => RouteStatusFactory::new()->create()->id,
-            'vehicle_id' => VehicleFactory::new()->create()->id,
+            'route_status_id' => RouteStatusEnum::getId(RouteStatusEnum::InProgress),
+            'vehicle_id' => Vehicle::VEHICLES['gasoline_car'],
             'points' => fake()->numberBetween(1, 100),
             'co2_produced' => fake()->numberBetween(1, 100),
             'distance_km' => fake()->numberBetween(1, 100),
@@ -55,14 +57,4 @@ class RouteFactory extends Factory
             'distance_km' => $distanceKm ?? fake()->numberBetween(1, 100),
         ]);
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 }

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('route_points', function (Blueprint $table) {
+        Schema::create('route_point', function (Blueprint $table) {
             $table->id();
             $table->foreignId('route_id')->constrained()->onDelete('cascade');
             $table->decimal('latitude', 10, 8);
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('route_points');
+        Schema::dropIfExists('route_point');
     }
 }; 

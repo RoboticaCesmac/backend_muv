@@ -10,6 +10,10 @@ class RoutePoint extends Model
 {
     use HasFactory;
 
+    protected $table = 'route_point';
+
+    protected $primaryKey = 'id';
+
     protected $fillable = [
         'route_id',
         'latitude',
