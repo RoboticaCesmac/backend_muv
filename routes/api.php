@@ -31,6 +31,7 @@ Route::prefix('v1')->group(function () {
             Route::get('vehicle', [VehicleMobileController::class, 'all']);
             Route::get('user-avatar', [UserAvatarController::class, 'all']);
             Route::prefix('route')->group(function () {
+                Route::get('', [RouteMobileController::class, 'index']);
                 Route::post('start', [RouteMobileController::class, 'start']);
                 Route::post('finish', [RouteMobileController::class, 'finish']);
                 Route::post('points', [RouteMobileController::class, 'points']);

@@ -17,6 +17,13 @@ class RouteMobileController extends Controller
         $this->routeMobileService = $routeMobileService;
     }
 
+    public function index()
+    {
+        $routes = $this->routeMobileService->index();
+
+        return response()->json($routes);
+    }
+
     public function start(RouteStartRequest $request)
     {
         $route = $this->routeMobileService->start($request->validated());

@@ -17,6 +17,15 @@ class RouteMobileService
         $this->route = $route;
     }
 
+    public function index()
+    {
+        $user = Auth::user();
+
+        $routes = $this->route->where('user_id', $user->id)->paginate(3);
+        
+        return $routes;
+    }
+
     public function start(array $data) : Route
     {
         return DB::transaction(function() use ($data) {

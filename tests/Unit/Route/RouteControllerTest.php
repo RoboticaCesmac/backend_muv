@@ -3,6 +3,7 @@
 namespace Tests\Unit\Route;
 
 use App\Enums\RouteStatusEnum;
+use App\Models\Route;
 use App\Models\Vehicle;
 use Database\Factories\RouteFactory;
 use Database\Factories\RoutePointFactory;
@@ -20,6 +21,21 @@ class RouteControllerTest extends TestCase
     {
         parent::setUp();
         $this->url = '/api/v1/mobile/route';
+    }
+
+    public function test_index_route()
+    {
+        $user = UserFactory::new()->create();
+
+        $routes = Route::where('user_id', $user->id)->get();
+
+        $response = $this->jsonAsUser('GET', $this->url , [], $user); 
+
+        $response->assertStatus(200);
+
+        $response->assertJson([
+            'data' => $routes->toArray(),
+        ]);
     }
 
     public function test_start_route()
