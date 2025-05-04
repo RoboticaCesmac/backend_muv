@@ -21,7 +21,7 @@ class RouteMobileService
     {
         $user = Auth::user();
 
-        $routes = $this->route->where('user_id', $user->id)->with('routePoints','vehicle')->paginate(3);
+        $routes = $this->route->where('user_id', $user->id)->with('routePoints','vehicle')->paginate(2);
         
         return $routes;
     }

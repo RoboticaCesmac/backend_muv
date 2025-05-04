@@ -92,10 +92,8 @@ class UserFactory extends Factory
 
     public function stateRouteFinalizada() {
        return $this->afterCreating(function (User $user) {
-           Route::factory()->create([
-               'user_id' => $user->id,
-               'route_status_id' => RouteStatusEnum::getId(RouteStatusEnum::Completed)
-           ]);
+
+            RouteFactory::new()->stateUserId($user->id)->stateRouteStatusId(RouteStatusEnum::getId(RouteStatusEnum::Completed))->create();
         });
     }
 }
