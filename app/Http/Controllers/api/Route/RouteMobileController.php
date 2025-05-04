@@ -7,6 +7,7 @@ use App\Http\Requests\api\Auth\Route\RoutePointRequest;
 use Illuminate\Routing\Controller;
 use App\Http\Requests\api\Auth\Route\RouteStartRequest;
 use App\Services\api\Route\RouteMobileService;
+use App\Http\Resources\Route\RouteIndexResource;
 
 class RouteMobileController extends Controller
 {
@@ -21,7 +22,7 @@ class RouteMobileController extends Controller
     {
         $routes = $this->routeMobileService->index();
 
-        return response()->json($routes);
+        return RouteIndexResource::collection($routes);
     }
 
     public function start(RouteStartRequest $request)

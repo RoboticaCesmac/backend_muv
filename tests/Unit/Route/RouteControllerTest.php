@@ -27,10 +27,12 @@ class RouteControllerTest extends TestCase
     {
         $user = UserFactory::new()->create();
 
+        $route = RouteFactory::new()->stateUserId($user->id)->create();
+
         $routes = Route::where('user_id', $user->id)->get();
 
         $response = $this->jsonAsUser('GET', $this->url , [], $user); 
-
+        dd($response->getContent());
         $response->assertStatus(200);
 
         $response->assertJson([
