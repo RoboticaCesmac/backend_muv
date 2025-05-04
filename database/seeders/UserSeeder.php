@@ -24,6 +24,7 @@ class UserSeeder extends Seeder
             ->stateAvatar(2)
             ->stateIsFirstLogin(false)
             ->stateRouteFinalizada()
+            ->stateRouteFinalizada()
             ->create();
     }
 }
