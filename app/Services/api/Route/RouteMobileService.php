@@ -21,45 +21,93 @@ class RouteMobileService
     {
         $user = Auth::user();
 
-        $routes = $this->route->where('user_id', $user->id)->with('routePoints','vehicle')->paginate(1);
-        
-        return $routes;
+        return $this->route
+            ->where('user_id', $user->id)
+            ->with('routePoints', 'vehicle')
+            ->paginate(1);
     }
 
-    public function start(array $data) : Route
+    public function start(array $data): Route
     {
-        return DB::transaction(function() use ($data) {
+        return DB::transaction(function () use ($data) {
             $user = Auth::user();
 
-            $this->route
+            // Fechar todas as rotas em progresso antes de iniciar nova
+            $openRoutes = $this->route->newQuery()
                 ->where('user_id', $user->id)
-                ->whereIn('route_status_id', [
-                    RouteStatusEnum::getId(RouteStatusEnum::InProgress),
-                ])
-                ->update([
-                    'route_status_id' => RouteStatusEnum::getId(RouteStatusEnum::Completed),
-                ]);
+                ->where('route_status_id', RouteStatusEnum::getId(RouteStatusEnum::InProgress))
+                ->with('routePoints', 'vehicle')
+                ->get();
 
-            $route = $this->route->create([
-                'user_id' => $user->id,
-                'vehicle_id' => $data['vehicle_id'],
+            foreach ($openRoutes as $oldRoute) {
+                // utiliza apenas os pontos existentes para finalizar a rota
+                $points = $oldRoute->routePoints
+                    ->sortBy('created_at')
+                    ->values();
+
+                $earthRadius   = 6371;
+                $totalDistance = 0.0;
+
+                // essa logica é repetitiva e deve virar um metodo
+                if ($points->count() > 1) {
+                    foreach ($points as $i => $pt) {
+                        if ($i === 0) {
+                            continue;
+                        }
+                        $prev     = $points[$i - 1];
+                        $latFrom  = deg2rad($prev->latitude);
+                        $lonFrom  = deg2rad($prev->longitude);
+                        $latTo    = deg2rad($pt->latitude);
+                        $lonTo    = deg2rad($pt->longitude);
+                        $latDelta = $latTo - $latFrom;
+                        $lonDelta = $lonTo - $lonFrom;
+
+                        $angle = 2 * asin(sqrt(
+                            pow(sin($latDelta / 2), 2) +
+                            cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)
+                        ));
+
+                        $totalDistance += $earthRadius * $angle;
+                    }
+                }
+
+                $distanceKm  = round($totalDistance, 2);
+                $vehicle     = $oldRoute->vehicle;
+                $co2         = $distanceKm * ($vehicle->co2_per_km ?? 0);
+                $pointsCalc  = $distanceKm * ($vehicle->points_per_km ?? 0);
+
+                // atualiza rota antiga como concluída com métricas corretas ou zeros
+                $oldRoute->update([
+                    'route_status_id' => RouteStatusEnum::getId(RouteStatusEnum::Completed),
+                    'ended_at'        => now(),
+                    'distance_km'     => $distanceKm,
+                    'co2_produced'    => round($co2, 2),
+                    'points'          => round($pointsCalc, 2),
+                ]);
+            }
+
+            // cria a nova rota
+            $newRoute = $this->route->create([
+                'user_id'         => $user->id,
+                'vehicle_id'      => $data['vehicle_id'],
                 'route_status_id' => RouteStatusEnum::getId(RouteStatusEnum::InProgress),
-                'started_at' => now(),
+                'started_at'      => now(),
             ]);
 
-            $route->routePoints()->create([
-                'route_id' => $route->id,
-                'latitude' => $data['latitude'],
+            // registra o primeiro ponto da nova rota
+            $newRoute->routePoints()->create([
+                'route_id'  => $newRoute->id,
+                'latitude'  => $data['latitude'],
                 'longitude' => $data['longitude'],
             ]);
 
-            return $route;
+            return $newRoute;
         });
     }
 
     public function finish(array $data): Route
     {
-        return DB::transaction(function() use ($data) {
+        return DB::transaction(function () use ($data) {
             $userId = Auth::id();
 
             $route = $this->route->newQuery()
@@ -76,54 +124,53 @@ class RouteMobileService
                 'longitude' => $data['longitude'],
             ]);
 
-            $pointsOrdered = $route->routePoints()
+            $points = $route->routePoints()
                 ->orderBy('created_at')
                 ->get(['latitude', 'longitude']);
 
             $earthRadius = 6371;
-            $distance = 0.0;
+            $totalDistance = 0.0;
 
-            foreach ($pointsOrdered as $index => $point) {
-                if ($index === 0) {
+                // essa logica é repetitiva e deve virar um metodo
+            foreach ($points as $i => $pt) {
+                if ($i === 0) {
                     continue;
                 }
-                $prev = $pointsOrdered[$index - 1];
-
+                $prev = $points[$i - 1];
                 $latFrom = deg2rad($prev->latitude);
                 $lonFrom = deg2rad($prev->longitude);
-                $latTo   = deg2rad($point->latitude);
-                $lonTo   = deg2rad($point->longitude);
+                $latTo   = deg2rad($pt->latitude);
+                $lonTo   = deg2rad($pt->longitude);
 
                 $latDelta = $latTo - $latFrom;
                 $lonDelta = $lonTo - $lonFrom;
 
                 $angle = 2 * asin(sqrt(
-                    pow(sin($latDelta / 2), 2)
-                    + cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)
+                    pow(sin($latDelta / 2), 2) +
+                    cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)
                 ));
 
-                $distance += $earthRadius * $angle;
+                $totalDistance += $earthRadius * $angle;
             }
 
-            $roundedDistance = round($distance, 2);
-            $vehicle = $route->vehicle;
+            $distanceKm  = round($totalDistance, 2);
+            $vehicle     = $route->vehicle;
+            $co2         = $distanceKm * ($vehicle->co2_per_km ?? 0);
+            $pointsCalc  = $distanceKm * ($vehicle->points_per_km ?? 0);
 
-            $co2Produced = $roundedDistance * ($vehicle->co2_per_km ?? 0);
-            $points = $roundedDistance * ($vehicle->points_per_km ?? 0);
-            
             $route->update([
                 'route_status_id' => RouteStatusEnum::getId(RouteStatusEnum::Completed),
                 'ended_at'        => now(),
-                'distance_km'     => $roundedDistance,
-                'co2_produced'    => round($co2Produced, 2),
-                'points'          => round($points, 2),
+                'distance_km'     => $distanceKm,
+                'co2_produced'    => round($co2, 2),
+                'points'          => round($pointsCalc, 2),
             ]);
 
             return $route->fresh();
         });
     }
 
-    public function points(Array $data) : Route
+    public function points(array $data): Route
     {
         $user = Auth::user();
 
@@ -132,16 +179,12 @@ class RouteMobileService
             ->where('route_status_id', RouteStatusEnum::getId(RouteStatusEnum::InProgress))
             ->first();
 
-        if (! $route) {
-            throw new RouteNotFoundException('Rota não encontradas');
-        }
-
-        if ($route->user_id !== $user->id) {
-            throw new RouteNotFoundException('Rota não encontradas');
+        if (! $route || $route->user_id !== $user->id) {
+            throw new RouteNotFoundException('Rota não encontrada');
         }
 
         $route->routePoints()->create([
-            'latitude' => $data['latitude'],
+            'latitude'  => $data['latitude'],
             'longitude' => $data['longitude'],
         ]);
 

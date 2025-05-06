@@ -29,6 +29,11 @@ class RouteControllerTest extends TestCase
 
         $route = RouteFactory::new()->stateUserId($user->id)->create();
 
+        $route->routePoints()->createMany([
+            ['latitude'  => -23.550520, 'longitude' => -46.633308],
+            ['latitude'  => -23.535350, 'longitude' => -46.633308],
+        ]);
+
         $routes = Route::where('user_id', $user->id)->get();
 
         $response = $this->jsonAsUser('GET', $this->url , [], $user); 

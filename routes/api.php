@@ -32,6 +32,7 @@ Route::prefix('v1')->group(function () {
             Route::get('user-avatar', [UserAvatarController::class, 'all']);
             Route::prefix('route')->group(function () {
                 Route::get('', [RouteMobileController::class, 'index']);
+                Route::get('route-screen', [RouteMobileController::class, 'routeScreen']);
                 Route::post('start', [RouteMobileController::class, 'start']);
                 Route::post('finish', [RouteMobileController::class, 'finish']);
                 Route::post('points', [RouteMobileController::class, 'points']);

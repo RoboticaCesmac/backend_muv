@@ -91,8 +91,16 @@ class UserFactory extends Factory
     }
 
     public function stateRouteFinalizada() {
-       return $this->afterCreating(function (User $user) {
-            RouteFactory::new()->stateUserId($user->id)->stateRouteStatusId(RouteStatusEnum::getId(RouteStatusEnum::Completed))->create();
+        return $this->afterCreating(function (User $user) {
+            $route = RouteFactory::new()
+                ->stateUserId($user->id)
+                ->stateRouteStatusId(RouteStatusEnum::getId(RouteStatusEnum::Completed))
+                ->create();
+
+                $route->routePoints()->createMany([
+                ['latitude'  => -23.550520, 'longitude' => -46.633308],
+                ['latitude'  => -23.535350, 'longitude' => -46.633308],
+            ]);
         });
     }
 }
