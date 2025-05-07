@@ -9,6 +9,6 @@ class VehicleService
 {
     public function all(): Collection
     {
-        return Vehicle::all();
+        return Vehicle::orderBy('co2_per_km', 'asc')->get();
     }
 }
