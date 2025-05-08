@@ -23,7 +23,7 @@ class RouteControllerTest extends TestCase
         $this->url = '/api/v1/mobile/route';
     }
 
-    public function test_index_route()
+    public function test_get_paginated_route()
     {
         $user = UserFactory::new()->create();
 
@@ -37,7 +37,7 @@ class RouteControllerTest extends TestCase
         $routes = Route::where('user_id', $user->id)->get();
 
         $response = $this->jsonAsUser('GET', $this->url , [], $user); 
-        dd($response->getContent());
+
         $response->assertStatus(200);
     }
 

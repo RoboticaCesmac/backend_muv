@@ -10,6 +10,7 @@ use App\Http\Requests\api\Auth\Route\RouteStartRequest;
 use App\Services\api\Route\RouteMobileService;
 use App\Http\Resources\Route\RouteIndexResource;
 use App\Models\Route;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class RouteMobileController extends Controller
@@ -21,9 +22,9 @@ class RouteMobileController extends Controller
         $this->routeMobileService = $routeMobileService;
     }
 
-    public function index()
+    public function getPaginated(Request $request)
     {
-        $routes = $this->routeMobileService->index();
+        $routes = $this->routeMobileService->getPaginated($request);
 
         return RouteIndexResource::collection($routes);
     }

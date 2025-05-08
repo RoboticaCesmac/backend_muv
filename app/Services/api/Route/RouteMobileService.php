@@ -6,6 +6,7 @@ use App\Enums\RouteStatusEnum;
 use App\Exceptions\Route\RouteNotFoundException;
 use App\Models\Route;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -22,14 +23,18 @@ class RouteMobileService
         $this->route = $route;
     }
 
-    public function index()
+    public function getPaginated(Request $request)
     {
         $user = Auth::user();
 
+        $perPage = 4;
+        $page = $request->input('page', 1);
+
         return $this->route
-            ->where('user_id', $user->id)
-            ->with('routePoints', 'vehicle')
-            ->paginate(4);
+            ->orderBy('created_at', 'desc')
+            ->skip(($page - 1) * $perPage)
+            ->take($perPage)
+            ->get();
     }
 
     /**
