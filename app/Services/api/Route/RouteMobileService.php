@@ -33,6 +33,7 @@ class RouteMobileService
         return $this->route
             ->orderBy('created_at', 'desc')
             ->skip(($page - 1) * $perPage)
+            ->where('user_id', $user->id)
             ->take($perPage)
             ->get();
     }
