@@ -29,7 +29,7 @@ class RouteMobileService
         return $this->route
             ->where('user_id', $user->id)
             ->with('routePoints', 'vehicle')
-            ->paginate(2);
+            ->paginate(4);
     }
 
     /**
