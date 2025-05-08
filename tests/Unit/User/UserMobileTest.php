@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\User;
 
+use App\Models\UserAvatar;
 use App\Models\Vehicle;
 use Carbon\Carbon;
 use Database\Factories\TokenFactory;
@@ -71,25 +72,52 @@ class UserMobileTest extends TestCase
 
     public function test_me_with_user_in_first_login(): void
     {
-        $user = UserFactory::new()->create();
+        $user = UserFactory::new()
+        ->stateVehicleId(Vehicle::VEHICLES['gasoline_car'])
+        ->stateIsFirstLogin(false)
+        ->stateAvatar(2)
+        ->create();
 
         $response = $this->jsonAsUser('GET', '/api/v1/auth/me', [], $user);
 
         $response->assertStatus(200);
 
-        $response->assertJson([
-                'id' => $user->id,
-                'user_name' => $user->user_name,
-                'email' => $user->email,
-                'date_of_birth' => $user->date_of_birth,
-                'gender' => $user->gender,
-                'level_data' => [
-                    'current_level' => 1,
-                    'point_to_next_level' => 100,
-                    'total_points' => 0,
-                    'total_points_of_next_level' => 100,
-                ],
+        $response->assertJsonStructure([
+            'id',
+            'user_name',
+            'email',
+            'date_of_birth',
+            'gender',
+            'total_points',
+            'total_km_driven',
+            'total_carbon_footprint',
+            'is_first_login',
+            'avatar' => [
+                'id',
+                'name',
+                "avatar_path",
+                "is_default",
+                "created_at",
+                "updated_at",
+                "avatar_url",
             ],
-        );
+            'vehicle' => [
+                'id',
+                'name',
+                'co2_per_km',
+                'points_per_km',
+                'icon_path',
+                'icon_url',
+            ],
+            'perfil_data' => [
+                'current_level',
+                'carbon_footprint_to_next_level',
+                'total_points',
+                'total_carbon_footprint',
+                'total_carbon_footprint_of_next_level',
+                'distance_traveled',
+                'current_level_url',
+            ],
+        ]);
     }
 }

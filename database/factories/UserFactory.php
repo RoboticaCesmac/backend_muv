@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Enums\RouteStatusEnum;
-use App\Models\Route;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -29,12 +28,11 @@ class UserFactory extends Factory
             'password' => Hash::make('teste'),
             'is_admin' => false,
             'is_first_login' => true,
-            'total_km' => 0,
+            'total_km_driven' => 0,
+            'total_carbon_footprint' => 0,
             'total_points' => 0,
             'date_of_birth' => fake()->date(),
             'gender' => fake()->randomElement(['male', 'female']),
-            'total_km' => 0,
-            'total_points' => 0,
         ];
     }
 

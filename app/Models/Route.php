@@ -20,15 +20,16 @@ class Route extends Model
         'route_status_id',
         'vehicle_id',
         'points',
-        'co2_produced',
+        'carbon_footprint',
         'distance_km',
         'started_at',
         'ended_at',
     ];
 
     protected $casts = [
-        'co2_produced' => 'float',
-        'distance_km' => 'float',
+        'carbon_footprint' => 'decimal:2',
+        'distance_km' => 'decimal:2',
+        'points' => 'decimal:2',
         'started_at' => 'datetime:Y-m-d H:i:s',
         'ended_at' => 'datetime:Y-m-d H:i:s',
     ];

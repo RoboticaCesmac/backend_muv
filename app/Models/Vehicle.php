@@ -26,8 +26,8 @@ class Vehicle extends Model
     ];
 
     protected $casts = [
-        'co2_per_km' => 'float',
-        'points_per_km' => 'float',
+        'co2_per_km' => 'decimal:3',
+        'points_per_km' => 'decimal:2',
     ];
 
     /**

@@ -29,8 +29,9 @@ class User extends Authenticatable implements JWTSubjectContract
         'password',
         'gender',
         'date_of_birth',
+        'total_carbon_footprint',
+        'total_km_driven',
         'total_points',
-        'total_km',
         'is_first_login',
         'email_verified_at',
         'vehicle_id',
@@ -60,8 +61,9 @@ class User extends Authenticatable implements JWTSubjectContract
         'is_first_login' => 'boolean',
         'vehicle_id' => 'integer',
         'user_level_id' => 'integer',
-        'total_km' => 'decimal:2',
-        'total_points' => 'integer',
+        'total_km_driven' => 'decimal:2',
+        'total_carbon_footprint' => 'decimal:2',
+        'total_points' => 'decimal:2',
     ];
 
     public function avatar(): BelongsTo
@@ -188,25 +190,33 @@ class User extends Authenticatable implements JWTSubjectContract
 
     public function getPerfilDataAttribute(): array
     {
-        $routes = $this->routes()->get();
+        // preciso botar depois filtro de 1 mes
+        $routes = $this->routes()->where('created_at', '>=', now()->subMonth())->get();
 
-        $totalPoints = $routes->sum('points') ?? 0;
+        $levels = UserLevel::orderBy('carbon_footprint_required', 'asc')->get();
 
-        $levels = UserLevel::orderBy('points_required', 'asc')->get();
+        $totalCarbonFootprint = round($routes->sum('carbon_footprint'), 2) ?? 0;
 
-        $currentLevel = $levels->firstWhere('points_required', '<=', $totalPoints);
+        $totalPoints = round($routes->sum('points'), 2) ?? 0;
 
-        $nextLevel = $levels->firstWhere('points_required', '>', $totalPoints);
+        $distanceTraveled = round($routes->sum('distance_km'), 2) ?? 0;
 
-        $distanceTraveled = $routes->sum('distance_km') ?? 0;
+        $currentLevel = $levels->firstWhere('carbon_footprint_required', '<=', $totalCarbonFootprint);
+
+        $nextLevel = $levels->firstWhere('carbon_footprint_required', '>', $totalCarbonFootprint);
+
+        $carbonFootprintToNextLevel = $nextLevel ? $nextLevel->carbon_footprint_required - $totalCarbonFootprint : 0;
+
+        $totalCarbonFootprintOfNextLevel = $nextLevel ? $nextLevel->carbon_footprint_required : $currentLevel->carbon_footprint_required;
 
         return [
             'current_level' => $currentLevel->level_number,
-            'point_to_next_level' => $nextLevel ? $nextLevel->points_required - $totalPoints : 0,
+            'carbon_footprint_to_next_level' => $carbonFootprintToNextLevel,
             'total_points' => $totalPoints,
-            'total_points_of_next_level' => $nextLevel ? $nextLevel->points_required : $currentLevel->points_required,
+            'total_carbon_footprint' => $totalCarbonFootprint,
+            'total_carbon_footprint_of_next_level' => $totalCarbonFootprintOfNextLevel,
             'distance_traveled' => $distanceTraveled,
-            'current_level_icon' => URL::asset($currentLevel->icon_path),
+            'current_level_url' => URL::asset($currentLevel->icon_path),
         ];
     }
 }

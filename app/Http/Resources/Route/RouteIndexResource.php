@@ -14,7 +14,7 @@ class RouteIndexResource extends JsonResource
             'route_status_id' => $this->route_status_id,
             'vehicle_id' => $this->vehicle_id,
             'points' => $this->points,
-            'co2_produced' => $this->co2_produced,
+            'carbon_footprint' => $this->carbon_footprint,
             'distance_km' => $this->distance_km,
             'started_at' => $this->started_at,
             'ended_at' => $this->ended_at,

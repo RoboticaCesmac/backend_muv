@@ -15,7 +15,7 @@
               <div class="level-info">
                 <h4>Nível {{ level.level_number }}</h4>
                 <div class="points-input">
-                  <label>Pontos requeridos:</label>
+                  <label>Pegada de carbono requerida:</label>
                   <div class="points-control">
                     <input 
                       type="number" 

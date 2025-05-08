@@ -15,7 +15,7 @@ class RouteFactory extends Factory
             'route_status_id' => RouteStatusEnum::getId(RouteStatusEnum::InProgress),
             'vehicle_id' => Vehicle::VEHICLES['gasoline_car'],
             'points' => fake()->numberBetween(1, 100),
-            'co2_produced' => fake()->numberBetween(1, 100),
+            'carbon_footprint' => fake()->numberBetween(1, 100),
             'distance_km' => fake()->numberBetween(1, 100),
             'started_at' => fake()->dateTime(),
             'ended_at' => fake()->dateTime(),

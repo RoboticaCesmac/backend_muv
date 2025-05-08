@@ -19,8 +19,9 @@ return new class extends Migration
             $table->string('password');
             $table->foreignId('vehicle_id')->nullable()->constrained('vehicles');
             $table->string('gender')->nullable();
-            $table->decimal('total_km', 10, 2)->nullable();
-            $table->integer('total_points')->nullable();
+            $table->decimal('total_km_driven', 10, 2)->nullable();
+            $table->decimal('total_carbon_footprint', 10, 2)->nullable();
+            $table->decimal('total_points', 10, 2)->nullable();
             $table->date('date_of_birth')->nullable();
             $table->boolean('is_admin')->default(false);
             $table->boolean('is_first_login')->default(true);

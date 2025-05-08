@@ -39,10 +39,6 @@ class RouteControllerTest extends TestCase
         $response = $this->jsonAsUser('GET', $this->url , [], $user); 
         dd($response->getContent());
         $response->assertStatus(200);
-
-        $response->assertJson([
-            'data' => $routes->toArray(),
-        ]);
     }
 
     public function test_start_route()
@@ -87,6 +83,7 @@ class RouteControllerTest extends TestCase
     public function test_finish_route()
     {
         $user = UserFactory::new()->create();
+
         $route = RouteFactory::new()->stateUserId($user->id)->create();
 
         $points = [

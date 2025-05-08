@@ -13,7 +13,7 @@ class UserLevelsFactory extends Factory
     {
         return [
             'level_number' => fake()->numberBetween(1, 10),
-            'points_required' => fake()->numberBetween(100, 1000),
+            'carbon_footprint_required' => fake()->numberBetween(100, 1000),
             'icon_path' => fake()->imageUrl(),
             'is_default' => false,
         ];
@@ -25,9 +25,9 @@ class UserLevelsFactory extends Factory
         ]);
     }
 
-    public function statePointsRequired(?int $pointsRequired = null) {
+    public function stateCarbonFootprintRequired(?int $carbonFootprintRequired = null) {
         return $this->state([
-            'points_required' => $pointsRequired ?? fake()->numberBetween(100, 1000),
+            'carbon_footprint_required' => $carbonFootprintRequired ?? fake()->numberBetween(100, 1000),
         ]);
     }
 

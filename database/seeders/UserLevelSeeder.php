@@ -11,28 +11,28 @@ class UserLevelSeeder extends Seeder
     {
         UserLevelsFactory::new()
             ->stateLevelNumber(1)
-            ->statePointsRequired(0)
+            ->stateCarbonFootprintRequired(0)
             ->stateIconPath('images/levels/IconeGrama.png')
             ->stateIsDefault(true)
             ->create();
 
         UserLevelsFactory::new()
             ->stateLevelNumber(2)
-            ->statePointsRequired(100)
+            ->stateCarbonFootprintRequired(100)
             ->stateIconPath('images/levels/IconeArbusto.png')
             ->stateIsDefault(true)
             ->create();
         
         UserLevelsFactory::new()
             ->stateLevelNumber(3)
-            ->statePointsRequired(250)
+            ->stateCarbonFootprintRequired(250)
             ->stateIconPath('images/levels/IconeFlor.png')
             ->stateIsDefault(true)
             ->create();
         
         UserLevelsFactory::new()
             ->stateLevelNumber(4)
-            ->statePointsRequired(500)
+            ->stateCarbonFootprintRequired(500)
             ->stateIconPath('images/levels/IconeArvore.png')
             ->stateIsDefault(true)
             ->create();

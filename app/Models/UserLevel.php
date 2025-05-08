@@ -12,7 +12,7 @@ class UserLevel extends Model
 
     protected $fillable = [
         'level_number',
-        'points_required',
+        'carbon_footprint_required',
         'icon_path',
         'is_default'
     ];

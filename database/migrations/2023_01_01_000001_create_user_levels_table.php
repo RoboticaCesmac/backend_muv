@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('user_levels', function (Blueprint $table) {
             $table->id();
             $table->integer('level_number');
-            $table->integer('points_required');
+            $table->integer('carbon_footprint_required');
             $table->string('icon_path');
             $table->boolean('is_default')->default(false);
             $table->timestamps();

@@ -28,40 +28,40 @@ class UserLevelController extends Controller
     public function update(Request $request, UserLevel $level)
     {
         $validated = $request->validate([
-            'points_required' => 'required|integer|min:0',
+            'carbon_footprint_required' => 'required|integer|min:0',
         ]);
 
         // Verificar se o level é 1, que deve ter sempre 0 pontos
-        if ($level->level_number === 1 && $validated['points_required'] !== 0) {
+        if ($level->level_number === 1 && $validated['carbon_footprint_required'] !== 0) {
             return response()->json([
                 'message' => 'O Nível 1 deve ter sempre 0 pontos',
-                'errors' => ['points_required' => ['O Nível 1 deve ter sempre 0 pontos']]
+                'errors' => ['carbon_footprint_required' => ['O Nível 1 deve ter sempre 0 pontos']]
             ], 422);
         }
 
         // Verificar se o level atual tem pontos maiores que o level anterior
         $previousLevel = UserLevel::where('level_number', $level->level_number - 1)->first();
-        if ($previousLevel && $validated['points_required'] <= $previousLevel->points_required) {
+        if ($previousLevel && $validated['carbon_footprint_required'] <= $previousLevel->carbon_footprint_required) {
             return response()->json([
-                'message' => 'Os pontos devem ser maiores que o nível anterior',
-                'errors' => ['points_required' => ['Os pontos devem ser maiores que o nível anterior (' . $previousLevel->points_required . ')']]
+                'message' => 'A pegada de carbono deve ser maior que o nível anterior',
+                'errors' => ['carbon_footprint_required' => ['A pegada de carbono deve ser maior que o nível anterior (' . $previousLevel->carbon_footprint_required . ')']]
             ], 422);
         }
 
         // Verificar se o level atual tem pontos menores que o próximo level
         $nextLevel = UserLevel::where('level_number', $level->level_number + 1)->first();
-        if ($nextLevel && $validated['points_required'] >= $nextLevel->points_required) {
+        if ($nextLevel && $validated['carbon_footprint_required'] >= $nextLevel->carbon_footprint_required) {
             return response()->json([
-                'message' => 'Os pontos devem ser menores que o próximo nível',
-                'errors' => ['points_required' => ['Os pontos devem ser menores que o próximo nível (' . $nextLevel->points_required . ')']]
+                'message' => 'A pegada de carbono deve ser menor que o próximo nível',
+                'errors' => ['carbon_footprint_required' => ['A pegada de carbono deve ser menor que o próximo nível (' . $nextLevel->carbon_footprint_required . ')']]
             ], 422);
         }
 
-        $level->points_required = $validated['points_required'];
+        $level->carbon_footprint_required = $validated['carbon_footprint_required'];
         $level->save();
 
         return response()->json([
-            'message' => 'Pontos do nível atualizados com sucesso',
+            'message' => 'Pegada de carbono do nível atualizados com sucesso',
             'level' => $level
         ]);
     }
