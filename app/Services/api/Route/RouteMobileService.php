@@ -121,11 +121,14 @@ class RouteMobileService
 
             foreach ($openRoutes as $oldRoute) {
                 // utiliza apenas os pontos existentes para finalizar a rota
-                $points = $oldRoute->routePoints
-                    ->sortBy('created_at')
-                    ->values();
+                $points = $oldRoute->routePoints()
+                    ->orderBy('created_at')
+                    ->get();
+                
+                // Ordenar pontos por data de criação
+                $pointsCollection = $points->values()->all();
 
-                $distanceKm = $this->calculateDistance($points->toArray());
+                $distanceKm = $this->calculateDistance($pointsCollection);
                 $vehicle = $oldRoute->vehicle;
                 $carbonFootprint = $this->calculateCarbonFootprint($distanceKm, $vehicle);
                 $pointsCalc = $distanceKm * ($vehicle->points_per_km ?? 0);
@@ -182,11 +185,15 @@ class RouteMobileService
                 'longitude' => $data['longitude'],
             ]);
 
+            // Obter todos os pontos já ordenados pelo banco de dados
             $points = $route->routePoints()
                 ->orderBy('created_at')
-                ->get(['latitude', 'longitude']);
+                ->get();
+            
+            // Converte para array simples
+            $pointsArray = $points->values()->all();
 
-            $distanceKm = $this->calculateDistance($points->toArray());
+            $distanceKm = $this->calculateDistance($pointsArray);
             $vehicle = $route->vehicle;
             $carbonFootprint = $this->calculateCarbonFootprint($distanceKm, $vehicle);
             $pointsCalc = $distanceKm * ($vehicle->points_per_km ?? 0);
