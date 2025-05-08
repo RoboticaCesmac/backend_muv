@@ -23,8 +23,6 @@ class UserSeeder extends Seeder
             ->stateVehicleId(2)
             ->stateAvatar(2)
             ->stateIsFirstLogin(false)
-            ->stateRouteFinalizada()
-            ->stateRouteFinalizada()
             ->create();
     }
 }
