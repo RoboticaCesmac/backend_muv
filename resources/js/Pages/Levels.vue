@@ -28,9 +28,9 @@
                       @click="updatePoints(level)" 
                       class="save-btn"
                       :class="{
-                        'disabled': pointsForm[level.id] === level.points_required || level.level_number === 1
+                        'disabled': pointsForm[level.id] === level.carbon_footprint_required || level.level_number === 1
                       }"
-                      :disabled="pointsForm[level.id] === level.points_required || level.level_number === 1"
+                      :disabled="pointsForm[level.id] === level.carbon_footprint_required || level.level_number === 1"
                     >
                       <span class="btn-content">
                         <i class="fas fa-save"></i>
@@ -78,7 +78,7 @@ const errors = ref({});
 onMounted(() => {
   const levelsList = props.levels.data || props.levels;
   levelsList.forEach(level => {
-    pointsForm.value[level.id] = level.points_required;
+    pointsForm.value[level.id] = level.carbon_footprint_required;
   });
 });
 
@@ -133,13 +133,13 @@ const updatePoints = async (level) => {
   
   try {
     const response = await axios.put(`/levels/${level.id}`, {
-      points_required: pointsForm.value[level.id]
+      carbon_footprint_required: pointsForm.value[level.id]
     });
     
-    level.points_required = pointsForm.value[level.id];
-    showToast('Pontos do nível atualizados com sucesso', 'success');
+    level.carbon_footprint_required = pointsForm.value[level.id];
+    showToast('Pegada de carbono do nível atualizada com sucesso', 'success');
   } catch (error) {
-    console.error('Erro ao atualizar pontos do nível:', error);
+    console.error('Erro ao atualizar pegada de carbono do nível:', error);
     
     if (error.response && error.response.data && error.response.data.errors) {
       errors.value = error.response.data.errors;
@@ -149,9 +149,9 @@ const updatePoints = async (level) => {
       showToast(firstError, 'error');
       
       // Resetar o valor do formulário para o valor original
-      pointsForm.value[level.id] = level.points_required;
+      pointsForm.value[level.id] = level.carbon_footprint_required;
     } else {
-      showToast('Erro ao atualizar os pontos do nível', 'error');
+      showToast('Erro ao atualizar a pegada de carbono do nível', 'error');
     }
   }
 };
