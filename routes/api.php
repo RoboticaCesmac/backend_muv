@@ -2,9 +2,9 @@
 
 use App\Http\Controllers\api\Auth\TokenController;
 use App\Http\Controllers\api\Auth\AuthController;
-use App\Http\Controllers\api\Route\RouteMobileController;
-use App\Http\Controllers\api\User\UserMobileController;
-use App\Http\Controllers\api\Vehicle\VehicleMobileController;
+use App\Http\Controllers\api\Route\RouteController;
+use App\Http\Controllers\api\User\UserController;
+use App\Http\Controllers\api\Vehicle\VehicleController;
 use App\Http\Controllers\api\UserAvatar\UserAvatarController;
 use Illuminate\Support\Facades\Route;
 
@@ -16,7 +16,7 @@ Route::prefix('v1')->group(function () {
         Route::post('send-register-token', [TokenController::class, 'sendRegisterToken']);
         Route::post('send-reset-password-token', [TokenController::class, 'sendResetPasswordToken']);
         Route::post('confirm-reset-password-token', [TokenController::class, 'confirmResetPasswordToken']);
-        Route::post('reset-password', [UserMobileController::class, 'resetPassword']);
+        Route::post('reset-password', [UserController::class, 'resetPassword']);
     });
 
     Route::middleware('auth:api')->group(function () {
@@ -27,15 +27,15 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::prefix('mobile')->group(function () {
-            Route::post('user/first-login', [UserMobileController::class, 'firstLogin']);
-            Route::get('vehicle', [VehicleMobileController::class, 'all']);
+            Route::post('user/first-login', [UserController::class, 'firstLogin']);
+            Route::get('vehicle', [VehicleController::class, 'all']);
             Route::get('user-avatar', [UserAvatarController::class, 'all']);
             Route::prefix('route')->group(function () {
-                Route::get('', [RouteMobileController::class, 'getPaginated']);
-                Route::get('route-screen', [RouteMobileController::class, 'routeScreen']);
-                Route::post('start', [RouteMobileController::class, 'start']);
-                Route::post('finish', [RouteMobileController::class, 'finish']);
-                Route::post('points', [RouteMobileController::class, 'points']);
+                Route::get('', [RouteController::class, 'getPaginated']);
+                Route::get('route-screen', [RouteController::class, 'routeScreen']);
+                Route::post('start', [RouteController::class, 'start']);
+                Route::post('finish', [RouteController::class, 'finish']);
+                Route::post('points', [RouteController::class, 'points']);
             });
         });
     });

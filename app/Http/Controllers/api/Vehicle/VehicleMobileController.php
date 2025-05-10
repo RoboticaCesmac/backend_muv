@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\api\Vehicle;
 
+use App\Http\Resources\Vehicle\VehicleUrlResource;
 use App\Services\api\Vehicle\VehicleService;
 use Illuminate\Routing\Controller;
-use App\Http\Resources\Vehicle\VehicleUrlResource;
 
-class VehicleMobileController extends Controller
+class VehicleController extends Controller
 {
     private $vehicleService;
     

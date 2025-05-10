@@ -190,7 +190,7 @@ class User extends Authenticatable implements JWTSubjectContract
 
     public function getPerfilDataAttribute(): array
     {
-        // preciso botar depois filtro de 1 mes
+        // ta om filtro de 1 mes.
         $routes = $this->routes()->where('created_at', '>=', now()->subMonth())->get();
 
         $levels = UserLevel::orderBy('carbon_footprint_required', 'asc')->get();

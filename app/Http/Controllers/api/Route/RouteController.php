@@ -7,45 +7,45 @@ use App\Http\Requests\api\Auth\Route\RouteFinishRequest;
 use App\Http\Requests\api\Auth\Route\RoutePointRequest;
 use Illuminate\Routing\Controller;
 use App\Http\Requests\api\Auth\Route\RouteStartRequest;
-use App\Services\api\Route\RouteMobileService;
 use App\Http\Resources\Route\RouteIndexResource;
 use App\Models\Route;
+use App\Services\api\Route\RouteService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class RouteMobileController extends Controller
+class RouteController extends Controller
 {
-    private RouteMobileService $routeMobileService;
+    private RouteService $routeService;
 
-    public function __construct(RouteMobileService $routeMobileService)
+    public function __construct(RouteService $routeService)
     {
-        $this->routeMobileService = $routeMobileService;
+        $this->routeService = $routeService;
     }
 
     public function getPaginated(Request $request)
     {
-        $routes = $this->routeMobileService->getPaginated($request);
+        $routes = $this->routeService->getPaginated($request);
 
         return RouteIndexResource::collection($routes);
     }
 
     public function start(RouteStartRequest $request)
     {
-        $route = $this->routeMobileService->start($request->validated());
+        $route = $this->routeService->start($request->validated());
 
         return response()->json(['message' => 'Rota Iniciada com sucesso']);
     }
 
     public function finish(RouteFinishRequest $request)
     {
-        $route = $this->routeMobileService->finish($request->validated());
+        $route = $this->routeService->finish($request->validated());
 
         return response()->json(['message' => 'Rota Finalizada com sucesso', 'data' => $route]);
     }
 
     public function points(RoutePointRequest $request)
     {
-        $this->routeMobileService->points($request->validated());
+        $this->routeService->points($request->validated());
 
         return response()->json(['message' => 'Ponto adicionado com sucesso']);
     }
