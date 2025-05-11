@@ -23,13 +23,4 @@ class UserAvatarController extends Controller
             'data' => UserAvatarUrlResource::collection($userAvatars)
         ]);
     }
-
-    public function update(UserAvatarUpdateRequest $request): JsonResponse
-    {
-        $this->userAvatarService->update(collect($request->validated()));
-
-        return response()->json([
-            'sucess' => true,
-        ]);
-    }
 }

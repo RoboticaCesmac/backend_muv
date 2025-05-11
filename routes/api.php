@@ -30,7 +30,8 @@ Route::prefix('v1')->group(function () {
             Route::post('user/first-login', [UserController::class, 'firstLogin']);
             Route::get('vehicle', [VehicleController::class, 'all']);
             Route::get('user-avatar', [UserAvatarController::class, 'all']);
-            Route::patch('user-avatar', [UserAvatarController::class, 'update']);
+            Route::patch('user-avatar', [UserController::class, 'updateAvatar']);
+            Route::patch('user-vehicle', [UserController::class, 'updateVehicle']);
             Route::prefix('route')->group(function () {
                 Route::get('', [RouteController::class, 'getPaginated']);
                 Route::get('route-screen', [RouteController::class, 'routeScreen']);

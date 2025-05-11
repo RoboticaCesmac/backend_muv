@@ -4,6 +4,8 @@ namespace App\Http\Controllers\api\User;
 
 use App\Http\Requests\api\Auth\FirstLoginRequest;
 use App\Http\Requests\api\Auth\ResetPasswordRequest;
+use App\Http\Requests\api\Avatar\UserAvatarUpdateRequest;
+use App\Http\Requests\api\User\UserVehicleUpdateRequest;
 use App\Services\api\User\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
@@ -27,5 +29,23 @@ class UserController extends Controller
         $this->userService->resetPassword($request->validated());
 
         return response()->json(['message' => 'Senha alterada com sucesso']);
+    }
+
+    public function updateAvatar(UserAvatarUpdateRequest $request): JsonResponse
+    {
+        $this->userService->updateAvatar(collect($request->validated()));
+
+        return response()->json([
+            'sucess' => true,
+        ]);
+    }
+
+    public function updateVehicle(UserVehicleUpdateRequest $request): JsonResponse
+    {
+        $this->userService->updateVehicle(collect($request->validated()));
+
+        return response()->json([
+            'sucess' => true,
+        ]);
     }
 }

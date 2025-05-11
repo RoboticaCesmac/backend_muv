@@ -4,6 +4,7 @@ namespace App\Services\api\User;
 use App\Exceptions\User\UserHasAlreadyLoggedInFirst;
 use App\Exceptions\User\UserNotFoundException;
 use App\Models\User;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 
 class UserService
@@ -39,6 +40,28 @@ class UserService
         $user->update([
             'password' => Hash::make($data['password']),
         ]);
+
+        return $user;
+    }
+
+    public function updateAvatar(Collection $data): User
+    {
+        $user = auth()->user();
+        
+        $user->avatar_id = $data->get('avatar_id');
+
+        $user->save();
+
+        return $user;
+    }
+
+    public function updateVehicle(Collection $data): User
+    {
+        $user = auth()->user();
+        
+        $user->vehicle_id = $data->get('vehicle_id');
+
+        $user->save();
 
         return $user;
     }
