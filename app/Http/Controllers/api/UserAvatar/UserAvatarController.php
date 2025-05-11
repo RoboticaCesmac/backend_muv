@@ -26,10 +26,10 @@ class UserAvatarController extends Controller
 
     public function update(UserAvatarUpdateRequest $request): JsonResponse
     {
-        $userAvatar = $this->userAvatarService->update(collect($request->validated()));
+        $this->userAvatarService->update(collect($request->validated()));
 
         return response()->json([
-            'data' => new UserAvatarUrlResource($userAvatar)
+            'sucess' => true,
         ]);
     }
 }
