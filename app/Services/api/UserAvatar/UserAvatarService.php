@@ -10,4 +10,15 @@ class UserAvatarService
     {
         return UserAvatar::all();
     }
+
+    public function update(Collection $data): UserAvatar
+    {
+        $user = auth()->user();
+        
+        $user->avatar_id = $data->get('avatar_id');
+
+        $user->save();
+
+        return $user;
+    }
 }
