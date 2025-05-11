@@ -27,11 +27,20 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::prefix('mobile')->group(function () {
-            Route::post('user/first-login', [UserController::class, 'firstLogin']);
-            Route::get('vehicle', [VehicleController::class, 'all']);
-            Route::get('user-avatar', [UserAvatarController::class, 'all']);
-            Route::patch('user-avatar', [UserController::class, 'updateAvatar']);
-            Route::patch('user-vehicle', [UserController::class, 'updateVehicle']);
+            Route::prefix('vehicle')->group(function () {
+                Route::get('/all', [VehicleController::class, 'all']);
+            });
+
+            Route::prefix('avatar')->group(function () {
+                Route::get('/all', [UserAvatarController::class, 'all']);
+            });
+
+            Route::prefix('user')->group(function () {
+                Route::post('first-login', [UserController::class, 'firstLogin']);
+                Route::patch('user-vehicle', [UserController::class, 'updateVehicle']);
+                Route::patch('user-avatar', [UserController::class, 'updateAvatar']);
+            });
+
             Route::prefix('route')->group(function () {
                 Route::get('', [RouteController::class, 'getPaginated']);
                 Route::get('route-screen', [RouteController::class, 'routeScreen']);
