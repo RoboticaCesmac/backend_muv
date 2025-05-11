@@ -2,7 +2,8 @@
 
 namespace App\Services\api\UserAvatar;
 use App\Models\UserAvatar;
-use Illuminate\Database\Eloquent\Collection;
+use App\Models\User;
+use Illuminate\Support\Collection;
 
 class UserAvatarService
 {
@@ -11,7 +12,7 @@ class UserAvatarService
         return UserAvatar::all();
     }
 
-    public function update(Collection $data): UserAvatar
+    public function update(Collection $data): User
     {
         $user = auth()->user();
         
