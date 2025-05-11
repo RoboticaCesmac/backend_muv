@@ -96,13 +96,19 @@ class RouteService
             $vehicle = $route->vehicle;
             $carbonFootprint = $this->calculateCarbonFootprint($distanceKm, $vehicle);
             $pointsCalc = $distanceKm * ($vehicle->points_per_km ?? 0);
+            
+            $endedAt = now();
+            $startedAt = $route->started_at;
+            $hoursElapsed = $startedAt->diffInSeconds($endedAt) / 3600;
+            $velocityAverage = $hoursElapsed > 0 ? $distanceKm / $hoursElapsed : 0;
 
             $route->update([
                 'route_status_id' => RouteStatusEnum::getId(RouteStatusEnum::Completed),
-                'ended_at'        => now(),
+                'ended_at'        => $endedAt,
                 'distance_km'     => $distanceKm,
                 'carbon_footprint' => $carbonFootprint,
                 'points'          => round($pointsCalc, 2),
+                'velocity_average' => round($velocityAverage, 2),
             ]);
             
             $this->updateUserStats($user, $distanceKm, round($pointsCalc, 2), $carbonFootprint);
@@ -221,13 +227,19 @@ class RouteService
             $vehicle = $oldRoute->vehicle;
             $carbonFootprint = $this->calculateCarbonFootprint($distanceKm, $vehicle);
             $pointsCalc = $distanceKm * ($vehicle->points_per_km ?? 0);
+            
+            $endedAt = now();
+            $startedAt = $oldRoute->started_at;
+            $hoursElapsed = $startedAt->diffInSeconds($endedAt) / 3600;
+            $velocityAverage = $hoursElapsed > 0 ? $distanceKm / $hoursElapsed : 0;
 
             $oldRoute->update([
                 'route_status_id' => RouteStatusEnum::getId(RouteStatusEnum::Completed),
-                'ended_at'        => now(),
+                'ended_at'        => $endedAt,
                 'distance_km'     => $distanceKm,
                 'carbon_footprint' => $carbonFootprint,
                 'points'          => round($pointsCalc, 2),
+                'velocity_average' => round($velocityAverage, 2),
             ]);
             
             $this->updateUserStats($user, $distanceKm, round($pointsCalc, 2), $carbonFootprint);

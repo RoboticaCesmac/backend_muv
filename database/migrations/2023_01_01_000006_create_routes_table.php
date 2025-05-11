@@ -19,6 +19,7 @@ return new class extends Migration
             $table->decimal('points', 10, 2)->nullable();
             $table->decimal('carbon_footprint', 10, 2)->nullable();
             $table->decimal('distance_km', 10, 2)->nullable();
+            $table->decimal('velocity_average', 10, 2)->nullable();
             $table->datetime('started_at')->nullable();
             $table->datetime('ended_at')->nullable();
             $table->timestamps();

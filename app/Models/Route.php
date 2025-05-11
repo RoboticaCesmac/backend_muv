@@ -22,6 +22,7 @@ class Route extends Model
         'points',
         'carbon_footprint',
         'distance_km',
+        'velocity_average',
         'started_at',
         'ended_at',
     ];
@@ -30,6 +31,7 @@ class Route extends Model
         'carbon_footprint' => 'decimal:2',
         'distance_km' => 'decimal:2',
         'points' => 'decimal:2',
+        'velocity_average' => 'decimal:2',
         'started_at' => 'datetime:Y-m-d H:i:s',
         'ended_at' => 'datetime:Y-m-d H:i:s',
     ];
