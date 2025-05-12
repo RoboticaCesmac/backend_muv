@@ -18,11 +18,13 @@ class RoutePoint extends Model
         'route_id',
         'latitude',
         'longitude',
+        'created_at',
     ];
 
     protected $casts = [
         'latitude' => 'float',
         'longitude' => 'float',
+        'created_at' => 'datetime:Y-m-d H:i:s',
     ];
 
     /**

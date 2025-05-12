@@ -45,9 +45,9 @@ class RouteController extends Controller
 
     public function points(RoutePointRequest $request)
     {
-        $this->routeService->points($request->validated());
+        $data = $this->routeService->points($request->validated());
 
-        return response()->json(['message' => 'Ponto adicionado com sucesso']);
+        return response()->json(['message' => 'Ponto adicionado com sucesso', 'data' => $data]);
     }
 
     public function routeScreen()

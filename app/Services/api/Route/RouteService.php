@@ -5,6 +5,7 @@ namespace App\Services\api\Route;
 use App\Enums\RouteStatusEnum;
 use App\Exceptions\Route\RouteNotFoundException;
 use App\Models\Route;
+use App\Models\RoutePoint;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
@@ -117,7 +118,7 @@ class RouteService
         });
     }
 
-    public function points(array $data): Route
+    public function points(array $data): RoutePoint
     {
         $user = Auth::user();
 
@@ -130,12 +131,9 @@ class RouteService
             throw new RouteNotFoundException('Rota não encontrada');
         }
 
-        $route->routePoints()->create([
-            'latitude'  => $data['latitude'],
-            'longitude' => $data['longitude'],
-        ]);
+        $routePoint = $route->routePoints()->create($data);
 
-        return $route;
+        return $routePoint;
     }
 
     /**
