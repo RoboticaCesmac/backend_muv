@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\api\UserAvatar;
 
-use App\Http\Requests\api\Avatar\UserAvatarUpdateRequest;
 use Illuminate\Http\JsonResponse;
 use App\Services\api\UserAvatar\UserAvatarService;
 use Illuminate\Routing\Controller;

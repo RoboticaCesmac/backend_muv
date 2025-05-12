@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\api\Avatar;
+namespace App\Http\Requests\api\User;
 
 use Illuminate\Foundation\Http\FormRequest;
 
