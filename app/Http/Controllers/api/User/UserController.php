@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api\User;
 
 use App\Http\Requests\api\Auth\FirstLoginRequest;
 use App\Http\Requests\api\Auth\ResetPasswordRequest;
+use App\Http\Requests\api\User\UserAvatarUpdateRequest;
 use App\Http\Requests\api\User\UserVehicleUpdateRequest;
 use App\Services\api\User\UserService;
 use Illuminate\Http\JsonResponse;
