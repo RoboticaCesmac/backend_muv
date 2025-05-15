@@ -68,20 +68,21 @@ class UsersSheet implements FromCollection, WithHeadings
 
     public function collection(): Collection
     {
-        return Route::select(
+        $data = Route::select(
             'users.id',
             'users.user_name',
             'users.email',
             DB::raw('COUNT(routes.id) as total_routes'),
             DB::raw('SUM(routes.distance_km) as total_distance'),
             DB::raw('SUM(routes.carbon_footprint) as total_carbon_footprint'),
+            DB::raw('SUM(routes.carbon_footprint) as total_carbon_saved'),
             DB::raw('SUM(routes.points) as total_points'),
-            DB::raw('AVG(routes.carbon_footprint) as average_carbon_footprint'),
-            DB::raw('AVG(routes.distance_km) as average_distance'),
-            DB::raw('SUM(CASE WHEN routes.vehicle_id IN (' . Vehicle::VEHICLES['gasoline_car'] . ', ' . Vehicle::VEHICLES['diesel_car'] . ') THEN 1 ELSE 0 END) as total_car_routes'),
-            DB::raw('SUM(CASE WHEN routes.vehicle_id = ' . Vehicle::VEHICLES['walking'] . ' THEN 1 ELSE 0 END) as total_walking_routes'),
-            DB::raw('SUM(CASE WHEN routes.vehicle_id = ' . Vehicle::VEHICLES['bicycle'] . ' THEN 1 ELSE 0 END) as total_bicycle_routes'),
-            DB::raw('SUM(CASE WHEN routes.vehicle_id = ' . Vehicle::VEHICLES['bus'] . ' THEN 1 ELSE 0 END) as total_bus_routes')
+            DB::raw('ROUND(AVG(routes.carbon_footprint), 3) as average_carbon_footprint'),
+            DB::raw('ROUND(AVG(routes.distance_km), 3) as average_distance'),
+            DB::raw('COALESCE(SUM(CASE WHEN routes.vehicle_id IN (' . Vehicle::VEHICLES['gasoline_car'] . ', ' . Vehicle::VEHICLES['diesel_car'] . ') THEN 1 ELSE 0 END), 0) as total_car_routes'),
+            DB::raw('COALESCE(SUM(CASE WHEN routes.vehicle_id = ' . Vehicle::VEHICLES['walking'] . ' THEN 1 ELSE 0 END), 0) as total_walking_routes'),
+            DB::raw('COALESCE(SUM(CASE WHEN routes.vehicle_id = ' . Vehicle::VEHICLES['bicycle'] . ' THEN 1 ELSE 0 END), 0) as total_bicycle_routes'),
+            DB::raw('COALESCE(SUM(CASE WHEN routes.vehicle_id = ' . Vehicle::VEHICLES['bus'] . ' THEN 1 ELSE 0 END), 0) as total_bus_routes')
         )
         ->join('users', 'routes.user_id', '=', 'users.id')
         ->whereMonth('routes.created_at', $this->date->month)
@@ -89,6 +90,22 @@ class UsersSheet implements FromCollection, WithHeadings
         ->where('routes.route_status_id', RouteStatusEnum::getId(RouteStatusEnum::Completed))
         ->groupBy('users.id', 'users.user_name', 'users.email')
         ->get();
+
+        // Ensure all numeric values are at least 0
+        return $data->map(function ($item) {
+            $item->total_routes = $item->total_routes ?? 0;
+            $item->total_distance = $item->total_distance ?? 0;
+            $item->total_carbon_footprint = $item->total_carbon_footprint ?? 0;
+            $item->total_carbon_saved = $item->total_carbon_saved ?? 0;
+            $item->total_points = $item->total_points ?? 0;
+            $item->average_carbon_footprint = $item->average_carbon_footprint ?? 0;
+            $item->average_distance = $item->average_distance ?? 0;
+            $item->total_car_routes = $item->total_car_routes ?? 0;
+            $item->total_walking_routes = $item->total_walking_routes ?? 0;
+            $item->total_bicycle_routes = $item->total_bicycle_routes ?? 0;
+            $item->total_bus_routes = $item->total_bus_routes ?? 0;
+            return $item;
+        });
     }
 
     public function headings(): array
@@ -100,6 +117,7 @@ class UsersSheet implements FromCollection, WithHeadings
             'Total de Rotas',
             'Distância Total (KM)',
             'Total de Carbono Gerado',
+            'Total de Carbono Economizado',
             'Total de Pontos',
             'Média de Carbono por Rota',
             'Média de Distância por Rota',
