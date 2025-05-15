@@ -25,6 +25,7 @@ class Route extends Model
         'velocity_average',
         'started_at',
         'ended_at',
+        'carbon_produced',
     ];
 
     protected $casts = [
@@ -34,6 +35,7 @@ class Route extends Model
         'velocity_average' => 'decimal:2',
         'started_at' => 'datetime:Y-m-d H:i:s',
         'ended_at' => 'datetime:Y-m-d H:i:s',
+        'carbon_produced' => 'decimal:2',
     ];
 
     /**

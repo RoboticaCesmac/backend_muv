@@ -16,6 +16,7 @@ class RouteFactory extends Factory
             'vehicle_id' => Vehicle::VEHICLES['gasoline_car'],
             'points' => fake()->numberBetween(1, 100),
             'carbon_footprint' => fake()->numberBetween(1, 100),
+            'carbon_produced' => fake()->numberBetween(1, 100),
             'distance_km' => fake()->numberBetween(1, 100),
             'velocity_average' => fake()->numberBetween(1, 100),
             'started_at' => fake()->dateTime(),
