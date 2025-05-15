@@ -21,6 +21,7 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::get('/users/search', [UserController::class, 'search'])->name('users.search');
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
     Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+    Route::get('/users/export-excel', [UserController::class, 'exportExcel'])->name('users.export-excel');
 
     Route::get('/dashboard', function () {
         return Inertia::render('Home', [

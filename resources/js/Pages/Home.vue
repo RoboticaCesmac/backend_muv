@@ -13,6 +13,30 @@
               @input="searchUsers"
             />
           </div>
+          <div class="excel-export">
+            <div class="date-filters">
+              <div class="date-input">
+                <label>Data Inicial:</label>
+                <input 
+                  type="month" 
+                  v-model="startDate"
+                  :max="endDate || undefined"
+                />
+              </div>
+              <div class="date-input">
+                <label>Data Final:</label>
+                <input 
+                  type="month" 
+                  v-model="endDate"
+                  :min="startDate || undefined"
+                />
+              </div>
+            </div>
+            <button @click="generateExcel" class="excel-btn" :disabled="!startDate || !endDate">
+              <i class="fas fa-file-excel"></i>
+              Gerar Excel
+            </button>
+          </div>
         </div>
       </div>
 
@@ -291,6 +315,8 @@ const showCreateModal = ref(false);
 const selectedUser = ref({});
 const loading = ref(false);
 const isDeleting = ref(false);
+const startDate = ref('');
+const endDate = ref('');
 
 const userData = computed(() => {
   return users.value.data || [];
@@ -518,6 +544,48 @@ const deleteUser = async () => {
     showToast('Erro ao excluir usuário. Por favor, tente novamente.', 'error');
   } finally {
     isDeleting.value = false;
+  }
+};
+
+// Função para gerar arquivo Excel vazio
+const generateExcel = async () => {
+  try {
+    const response = await axios.get('/users/export-excel', {
+      params: {
+        start_date: startDate.value,
+        end_date: endDate.value
+      },
+      responseType: 'blob'
+    });
+    
+    // Criar um link para download
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'usuarios.xlsx');
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    
+    showToast('Arquivo Excel gerado com sucesso!', 'success');
+  } catch (error) {
+    console.error('Erro ao gerar arquivo Excel:', error);
+    
+    // Se for uma resposta de erro, tentar ler a mensagem do blob
+    if (error.response?.data instanceof Blob) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const errorData = JSON.parse(reader.result);
+          showToast(errorData.message || 'Erro ao gerar arquivo Excel', 'warning');
+        } catch (e) {
+          showToast('Erro ao gerar arquivo Excel. Por favor, tente novamente.', 'error');
+        }
+      };
+      reader.readAsText(error.response.data);
+    } else {
+      showToast('Erro ao gerar arquivo Excel. Por favor, tente novamente.', 'error');
+    }
   }
 };
 
@@ -1136,5 +1204,70 @@ onMounted(() => {
     transform: translateX(0);
     opacity: 1;
   }
+}
+
+.excel-btn {
+  background-color: #217346;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.25rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.excel-btn:hover {
+  background-color: #1e6b3d;
+  transform: translateY(-1px);
+}
+
+.excel-btn i {
+  font-size: 1.1rem;
+}
+
+.excel-export {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.date-filters {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.date-input {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.date-input label {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.date-input input {
+  padding: 0.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.date-input input:focus {
+  outline: none;
+  border-color: #3490dc;
+  box-shadow: 0 0 0 0.2rem rgba(52, 144, 220, 0.25);
+}
+
+.excel-btn:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+  transform: none;
 }
 </style> 

@@ -7,6 +7,9 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use App\Exports\UsersExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class UserController extends Controller
 {
@@ -87,5 +90,33 @@ class UserController extends Controller
         $user->delete();
 
         return response()->json(['message' => 'Usuário excluído com sucesso']);
+    }
+
+    /**
+     * Exporta os usuários para um arquivo Excel
+     */
+    public function exportExcel(Request $request)
+    {
+        try {
+            $request->validate([
+                'start_date' => 'required|date_format:Y-m',
+                'end_date' => 'required|date_format:Y-m|after_or_equal:start_date',
+            ]);
+
+            $export = new UsersExport($request->start_date, $request->end_date);
+
+            if (!$export->hasData()) {
+                return response()->json([
+                    'message' => 'Não existem dados de rotas finalizadas para o período selecionado.'
+                ], 404);
+            }
+
+            return Excel::download($export, 'usuarios.xlsx');
+        } catch (\Exception $e) {
+            Log::error('Erro ao exportar Excel: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Erro ao gerar arquivo Excel: ' . $e->getMessage()
+            ], 500);
+        }
     }
 } 
