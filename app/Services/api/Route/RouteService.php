@@ -103,6 +103,7 @@ class RouteService
             $hoursElapsed = $startedAt->diffInSeconds($endedAt) / 3600;
             $velocityAverage = $hoursElapsed > 0 ? $distanceKm / $hoursElapsed : 0;
             $carbonProduced = $distanceKm * ($vehicle->co2_per_km ?? 0);
+            
             $route->update([
                 'route_status_id' => RouteStatusEnum::getId(RouteStatusEnum::Completed),
                 'ended_at'        => $endedAt,

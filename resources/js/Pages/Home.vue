@@ -547,7 +547,7 @@ const deleteUser = async () => {
   }
 };
 
-// Função para gerar arquivo Excel vazio
+// Função para gerar arquivo Excel
 const generateExcel = async () => {
   try {
     const response = await axios.get('/users/export-excel', {
@@ -558,20 +558,30 @@ const generateExcel = async () => {
       responseType: 'blob'
     });
     
-    // Criar um link para download
+    // Format dates for filename
+    const formatDateForFilename = (dateStr) => {
+      const date = new Date(dateStr);
+      return date.toISOString().split('T')[0]; // YYYY-MM-DD format
+    };
+    
+    // Create filename with the specified format
+    const filename = `${formatDateForFilename(startDate.value)}-${formatDateForFilename(endDate.value)}-usuarios.xlsx`;
+    
+    // Create a link for download
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', 'usuarios.xlsx');
+    link.setAttribute('download', filename);
     document.body.appendChild(link);
     link.click();
     link.remove();
+    window.URL.revokeObjectURL(url);
     
     showToast('Arquivo Excel gerado com sucesso!', 'success');
   } catch (error) {
     console.error('Erro ao gerar arquivo Excel:', error);
     
-    // Se for uma resposta de erro, tentar ler a mensagem do blob
+    // If it's an error response, try to read the message from the blob
     if (error.response?.data instanceof Blob) {
       const reader = new FileReader();
       reader.onload = () => {

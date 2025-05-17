@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use App\Exports\UsersExport;
 use Maatwebsite\Excel\Facades\Excel;
+use Carbon\Carbon;
 
 class UserController extends Controller
 {
@@ -111,7 +112,13 @@ class UserController extends Controller
                 ], 404);
             }
 
-            return Excel::download($export, 'usuarios.xlsx');
+            $startDate = Carbon::parse($request->start_date)->format('m-Y');
+            $endDate = Carbon::parse($request->end_date)->format('m-Y');
+            $filename = "{$startDate}-{$endDate}-usuarios.xlsx";
+
+            return Excel::download($export, $filename, \Maatwebsite\Excel\Excel::XLSX, [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ]);
         } catch (\Exception $e) {
             Log::error('Erro ao exportar Excel: ' . $e->getMessage());
             return response()->json([

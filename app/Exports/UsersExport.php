@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
+use Maatwebsite\Excel\Concerns\WithTitle;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -44,7 +45,7 @@ class UsersExport implements WithMultipleSheets
                 ->exists();
 
             if ($hasData) {
-                $monthName = ucfirst($currentDate->locale('pt_BR')->format('F Y'));
+                $monthName = $currentDate->locale('pt_BR')->isoFormat('MMMM');
                 $sheets[] = new UsersSheet($currentDate->copy(), $monthName);
             }
 
@@ -55,7 +56,7 @@ class UsersExport implements WithMultipleSheets
     }
 }
 
-class UsersSheet implements FromCollection, WithHeadings
+class UsersSheet implements FromCollection, WithHeadings, WithTitle
 {
     protected $date;
     protected $sheetName;
@@ -72,13 +73,13 @@ class UsersSheet implements FromCollection, WithHeadings
             'users.id',
             'users.user_name',
             'users.email',
-            DB::raw('COUNT(routes.id) as total_routes'),
-            DB::raw('SUM(routes.distance_km) as total_distance'),
-            DB::raw('SUM(routes.carbon_footprint) as total_carbon_footprint'),
-            DB::raw('SUM(routes.carbon_footprint) as total_carbon_saved'),
-            DB::raw('SUM(routes.points) as total_points'),
-            DB::raw('ROUND(AVG(routes.carbon_footprint), 3) as average_carbon_footprint'),
-            DB::raw('ROUND(AVG(routes.distance_km), 3) as average_distance'),
+            DB::raw('COALESCE(COUNT(routes.id), 0) as total_routes'),
+            DB::raw('COALESCE(SUM(routes.distance_km), 0) as total_distance'),
+            DB::raw('COALESCE(SUM(routes.carbon_footprint), 0) as total_carbon_footprint'),
+            DB::raw('COALESCE(SUM(routes.carbon_footprint), 0) as total_carbon_saved'),
+            DB::raw('COALESCE(SUM(routes.points), 0) as total_points'),
+            DB::raw('COALESCE(ROUND(AVG(routes.carbon_footprint), 3), 0) as average_carbon_footprint'),
+            DB::raw('COALESCE(ROUND(AVG(routes.distance_km), 3), 0) as average_distance'),
             DB::raw('COALESCE(SUM(CASE WHEN routes.vehicle_id IN (' . Vehicle::VEHICLES['gasoline_car'] . ', ' . Vehicle::VEHICLES['diesel_car'] . ') THEN 1 ELSE 0 END), 0) as total_car_routes'),
             DB::raw('COALESCE(SUM(CASE WHEN routes.vehicle_id = ' . Vehicle::VEHICLES['walking'] . ' THEN 1 ELSE 0 END), 0) as total_walking_routes'),
             DB::raw('COALESCE(SUM(CASE WHEN routes.vehicle_id = ' . Vehicle::VEHICLES['bicycle'] . ' THEN 1 ELSE 0 END), 0) as total_bicycle_routes'),
@@ -90,23 +91,31 @@ class UsersSheet implements FromCollection, WithHeadings
         ->where('routes.route_status_id', RouteStatusEnum::getId(RouteStatusEnum::Completed))
         ->groupBy('users.id', 'users.user_name', 'users.email')
         ->get();
-
-        // Ensure all numeric values are at least 0
+    
         return $data->map(function ($item) {
-            $item->total_routes = $item->total_routes ?? 0;
-            $item->total_distance = $item->total_distance ?? 0;
-            $item->total_carbon_footprint = $item->total_carbon_footprint ?? 0;
-            $item->total_carbon_saved = $item->total_carbon_saved ?? 0;
-            $item->total_points = $item->total_points ?? 0;
-            $item->average_carbon_footprint = $item->average_carbon_footprint ?? 0;
-            $item->average_distance = $item->average_distance ?? 0;
-            $item->total_car_routes = $item->total_car_routes ?? 0;
-            $item->total_walking_routes = $item->total_walking_routes ?? 0;
-            $item->total_bicycle_routes = $item->total_bicycle_routes ?? 0;
-            $item->total_bus_routes = $item->total_bus_routes ?? 0;
+            $numericFields = [
+                'total_routes',
+                'total_distance',
+                'total_carbon_footprint',
+                'total_carbon_saved',
+                'total_points',
+                'average_carbon_footprint',
+                'average_distance',
+                'total_car_routes',
+                'total_walking_routes',
+                'total_bicycle_routes',
+                'total_bus_routes'
+            ];
+        
+            foreach ($numericFields as $field) {
+                // Garantindo que valores nulos ou zero sejam convertidos para a string "0"
+                $item->$field = isset($item->$field) && $item->$field != 0 ? (float) $item->$field : '0';
+            }
+        
             return $item;
         });
     }
+    
 
     public function headings(): array
     {
