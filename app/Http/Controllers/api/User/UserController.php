@@ -48,4 +48,13 @@ class UserController extends Controller
             'sucess' => true,
         ]);
     }
+
+    public function destroy(): JsonResponse
+    {
+        $this->userService->destroy();
+
+        return response()->json([
+            'sucess' => true,
+        ]);
+    }
 }

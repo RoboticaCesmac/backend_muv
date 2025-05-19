@@ -65,4 +65,13 @@ class UserService
 
         return $user;
     }
+
+    public function destroy(): User
+    {
+        $user = auth()->user();
+        
+        $user->delete();
+        
+        return $user;
+    }
 }

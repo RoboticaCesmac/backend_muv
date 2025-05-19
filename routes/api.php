@@ -39,6 +39,7 @@ Route::prefix('v1')->group(function () {
                 Route::post('first-login', [UserController::class, 'firstLogin']);
                 Route::patch('user-vehicle', [UserController::class, 'updateVehicle']);
                 Route::patch('user-avatar', [UserController::class, 'updateAvatar']);
+                Route::delete('', [UserController::class, 'destroy']);
             });
 
             Route::prefix('route')->group(function () {
