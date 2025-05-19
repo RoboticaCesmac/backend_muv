@@ -2,7 +2,6 @@
 
 namespace App\Exports;
 
-use App\Models\User;
 use App\Models\Route;
 use App\Models\Vehicle;
 use App\Enums\RouteStatusEnum;
@@ -38,7 +37,6 @@ class UsersExport implements WithMultipleSheets
         $currentDate = $this->startDate->copy();
 
         while ($currentDate <= $this->endDate) {
-            // Check if there's data for this month
             $hasData = Route::where('route_status_id', RouteStatusEnum::getId(RouteStatusEnum::Completed))
                 ->whereMonth('created_at', $currentDate->month)
                 ->whereYear('created_at', $currentDate->year)
@@ -70,7 +68,6 @@ class UsersSheet implements FromCollection, WithHeadings, WithTitle
     public function collection(): Collection
     {
         $data = Route::select(
-            'users.id',
             'users.user_name',
             'users.email',
             DB::raw('COALESCE(COUNT(routes.id), 0) as total_routes'),
@@ -89,52 +86,89 @@ class UsersSheet implements FromCollection, WithHeadings, WithTitle
         ->whereMonth('routes.created_at', $this->date->month)
         ->whereYear('routes.created_at', $this->date->year)
         ->where('routes.route_status_id', RouteStatusEnum::getId(RouteStatusEnum::Completed))
-        ->groupBy('users.id', 'users.user_name', 'users.email')
+        ->groupBy('users.user_name', 'users.email')
         ->get();
-    
-        return $data->map(function ($item) {
-            $numericFields = [
-                'total_routes',
-                'total_distance',
-                'total_carbon_footprint',
-                'total_carbon_saved',
-                'total_points',
-                'average_carbon_footprint',
-                'average_distance',
-                'total_car_routes',
-                'total_walking_routes',
-                'total_bicycle_routes',
-                'total_bus_routes'
-            ];
-        
-            foreach ($numericFields as $field) {
-                // Garantindo que valores nulos ou zero sejam convertidos para a string "0"
-                $item->$field = isset($item->$field) && $item->$field != 0 ? (float) $item->$field : '0';
+
+        $header = [];
+        foreach ($data as $user) {
+            $header[] = $user->user_name;
+        }
+
+        $fields = [
+            'Nome do Usuário' => 'user_name',
+            'Email' => 'email',
+            'Total de Rotas' => 'total_routes',
+            'Distância Total (KM)' => 'total_distance',
+            'Total de Carbono Gerado' => 'total_carbon_footprint',
+            'Total de Carbono Economizado' => 'total_carbon_saved',
+            'Total de Pontos' => 'total_points',
+            'Média de Carbono por Rota' => 'average_carbon_footprint',
+            'Média de Distância por Rota' => 'average_distance',
+            'Total de Rotas de Carro' => 'total_car_routes',
+            'Total de Rotas a Pé' => 'total_walking_routes',
+            'Total de Rotas de Bicicleta' => 'total_bicycle_routes',
+            'Total de Rotas de Ônibus' => 'total_bus_routes',
+        ];
+
+        // Campos numéricos para tratar zeros
+        $numericFields = [
+            'total_routes',
+            'total_distance',
+            'total_carbon_footprint',
+            'total_carbon_saved',
+            'total_points',
+            'average_carbon_footprint',
+            'average_distance',
+            'total_car_routes',
+            'total_walking_routes',
+            'total_bicycle_routes',
+            'total_bus_routes',
+        ];
+
+        $rows = [];
+        foreach ($fields as $label => $field) {
+            $row = [$label];
+            foreach ($data as $user) {
+                $value = isset($user->$field) ? $user->$field : '';
+                if (in_array($field, $numericFields)) {
+                    $row[] = ($value === null || $value === '' || $value == 0) ? '0' : $value;
+                } else {
+                    $row[] = $value;
+                }
             }
-        
-            return $item;
-        });
+            $rows[] = $row;
+        }
+
+        // Transpor linhas para colunas: cada coluna é um usuário
+        $transposed = [];
+        $numUsers = count($header);
+        for ($i = 0; $i <= count($fields); $i++) {
+            $transposedRow = [];
+            foreach ($rows as $row) {
+                $transposedRow[] = $row[$i] ?? '';
+            }
+            $transposed[] = $transposedRow;
+        }
+
+        // A primeira coluna (A) são os nomes dos campos
+        $final = [];
+        foreach (array_keys($fields) as $i => $fieldLabel) {
+            $line = [$fieldLabel];
+            foreach ($data as $user) {
+                $value = $rows[$i][$header ? array_search($user->user_name, $header) + 1 : 1] ?? '';
+                $line[] = $value;
+            }
+            $final[] = $line;
+        }
+        // Adiciona o cabeçalho dos usuários na primeira linha
+        array_unshift($final, array_merge([''], $header));
+
+        return collect($final);
     }
-    
 
     public function headings(): array
     {
-        return [
-            'ID',
-            'Nome do Usuário',
-            'Email',
-            'Total de Rotas',
-            'Distância Total (KM)',
-            'Total de Carbono Gerado',
-            'Total de Carbono Economizado',
-            'Total de Pontos',
-            'Média de Carbono por Rota',
-            'Média de Distância por Rota',
-            'Total de Rotas de Carro',
-            'Total de Rotas a Pé',
-            'Total de Rotas de Bicicleta',
-            'Total de Rotas de Ônibus'
-        ];
+        return [];
     }
 
     public function title(): string
