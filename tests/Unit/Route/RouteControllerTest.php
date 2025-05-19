@@ -72,7 +72,7 @@ class RouteControllerTest extends TestCase
         ];
 
         $response = $this->jsonAsUser('POST', $this->url . "/points", $form, $user);
-
+        dd($response->getContent());
         $response->assertStatus(200);
 
         $response->assertJson([
