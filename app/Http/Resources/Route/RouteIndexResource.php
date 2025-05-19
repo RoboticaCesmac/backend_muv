@@ -21,9 +21,7 @@ class RouteIndexResource extends JsonResource
             'ended_at' => $this->ended_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'route_points' => $this->whenLoaded('routePoints', function () {
-                return $this->routePoints->orderBy('created_at', 'desc');
-            }),
+            'route_points' => $this->whenLoaded('routePoints', $this->routePoints->sortByDesc('created_at')),
             'vehicle'      => $this->whenLoaded('vehicle', new VehicleUrlResource($this->vehicle)),
         ];
     }

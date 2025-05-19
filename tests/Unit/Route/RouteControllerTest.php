@@ -35,8 +35,9 @@ class RouteControllerTest extends TestCase
         ]);
 
         $routes = Route::where('user_id', $user->id)->get();
-
+        
         $response = $this->jsonAsUser('GET', $this->url , [], $user); 
+        dd($response->getContent());
 
         $response->assertStatus(200);
     }
@@ -72,7 +73,7 @@ class RouteControllerTest extends TestCase
         ];
 
         $response = $this->jsonAsUser('POST', $this->url . "/points", $form, $user);
-        dd($response->getContent());
+
         $response->assertStatus(200);
 
         $response->assertJson([
