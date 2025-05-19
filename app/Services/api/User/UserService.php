@@ -70,7 +70,7 @@ class UserService
     {
         $user = auth()->user();
         
-        $user->delete();
+        $user->forceDelete();
         
         return $user;
     }
