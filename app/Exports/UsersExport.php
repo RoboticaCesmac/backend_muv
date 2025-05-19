@@ -89,11 +89,6 @@ class UsersSheet implements FromCollection, WithHeadings, WithTitle
         ->groupBy('users.user_name', 'users.email')
         ->get();
 
-        $header = [];
-        foreach ($data as $user) {
-            $header[] = $user->user_name;
-        }
-
         $fields = [
             'Nome do Usuário' => 'user_name',
             'Email' => 'email',
@@ -110,7 +105,6 @@ class UsersSheet implements FromCollection, WithHeadings, WithTitle
             'Total de Rotas de Ônibus' => 'total_bus_routes',
         ];
 
-        // Campos numéricos para tratar zeros
         $numericFields = [
             'total_routes',
             'total_distance',
@@ -125,7 +119,7 @@ class UsersSheet implements FromCollection, WithHeadings, WithTitle
             'total_bus_routes',
         ];
 
-        $rows = [];
+        $final = [];
         foreach ($fields as $label => $field) {
             $row = [$label];
             foreach ($data as $user) {
@@ -136,33 +130,8 @@ class UsersSheet implements FromCollection, WithHeadings, WithTitle
                     $row[] = $value;
                 }
             }
-            $rows[] = $row;
+            $final[] = $row;
         }
-
-        // Transpor linhas para colunas: cada coluna é um usuário
-        $transposed = [];
-        $numUsers = count($header);
-        for ($i = 0; $i <= count($fields); $i++) {
-            $transposedRow = [];
-            foreach ($rows as $row) {
-                $transposedRow[] = $row[$i] ?? '';
-            }
-            $transposed[] = $transposedRow;
-        }
-
-        // A primeira coluna (A) são os nomes dos campos
-        $final = [];
-        foreach (array_keys($fields) as $i => $fieldLabel) {
-            $line = [$fieldLabel];
-            foreach ($data as $user) {
-                $value = $rows[$i][$header ? array_search($user->user_name, $header) + 1 : 1] ?? '';
-                $line[] = $value;
-            }
-            $final[] = $line;
-        }
-        // Adiciona o cabeçalho dos usuários na primeira linha
-        array_unshift($final, array_merge([''], $header));
-
         return collect($final);
     }
 
