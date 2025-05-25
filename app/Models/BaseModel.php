@@ -6,13 +6,12 @@ use Carbon\Carbon;
 use DateTime;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
-class BaseModel extends EloquentModel {
 
-    protected function serializeDate(DateTimeInterface $date)
+class BaseModel extends EloquentModel {
+    
+    public function serializeDate(\DateTimeInterface $date)
     {
-        $date = Carbon::instance($date);
-        return $date->setTimezone('America/Sao_Paulo')
-                    ->format(DateTime::RFC3339_EXTENDED);
+        return $date->setTimezone(new \DateTimeZone('America/Sao_Paulo'))->format('Y-m-d\TH:i:s.uP');
     }
     
 }
