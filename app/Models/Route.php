@@ -32,11 +32,11 @@ class Route extends BaseModel
         'distance_km' => 'decimal:2',
         'points' => 'decimal:2',
         'velocity_average' => 'decimal:2',
-        'started_at' => 'datetime:Y-m-d H:i:s',
-        'ended_at' => 'datetime:Y-m-d H:i:s',
+        'started_at' => 'datetime',
+        'ended_at' => 'datetime',
         'carbon_produced' => 'decimal:2',
-        'created_at' => 'datetime:Y-m-d H:i:s',
-        'updated_at' => 'datetime:Y-m-d H:i:s',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime'
     ];
 
     /**
