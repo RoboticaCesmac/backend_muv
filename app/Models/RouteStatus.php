@@ -4,10 +4,9 @@ namespace App\Models;
 
 use App\Enums\RouteStatusEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class RouteStatus extends Model
+class RouteStatus extends BaseModel
 {
     use HasFactory;
 

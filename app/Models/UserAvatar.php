@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class UserAvatar extends Model
+class UserAvatar extends BaseModel
 {
     protected $fillable = ['name', 'avatar_path', 'is_default'];
 
