@@ -35,6 +35,8 @@ class Route extends BaseModel
         'started_at' => 'datetime:Y-m-d H:i:s',
         'ended_at' => 'datetime:Y-m-d H:i:s',
         'carbon_produced' => 'decimal:2',
+        'created_at' => 'datetime:Y-m-d H:i:s',
+        'updated_at' => 'datetime:Y-m-d H:i:s',
     ];
 
     /**
