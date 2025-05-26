@@ -86,7 +86,6 @@ class RouteService
             }
 
             $route->routePoints()->create($data);
-
             $points = $route->routePoints()
                 ->orderBy('created_at')
                 ->get()
@@ -102,8 +101,8 @@ class RouteService
             $startedAt = $route->started_at;
             $hoursElapsed = $startedAt->diffInSeconds($endedAt) / 3600;
             $velocityAverage = $hoursElapsed > 0 ? $distanceKm / $hoursElapsed : 0;
-            $carbonProduced = $distanceKm * ($vehicle->co2_per_km ?? 0);
             
+            $carbonProduced = $distanceKm * $vehicle->co2_per_km;
             $route->update([
                 'route_status_id' => RouteStatusEnum::getId(RouteStatusEnum::Completed),
                 'ended_at'        => $endedAt,
