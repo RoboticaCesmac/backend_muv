@@ -88,7 +88,7 @@ class UserController extends Controller
             return response()->json(['message' => 'Este usuário não pode ser excluído'], 403);
         }
         
-        $user->delete();
+        $user->forceDelete();
 
         return response()->json(['message' => 'Usuário excluído com sucesso']);
     }
