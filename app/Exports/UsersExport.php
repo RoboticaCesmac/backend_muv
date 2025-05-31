@@ -80,7 +80,9 @@ class UsersSheet implements FromCollection, WithHeadings, WithTitle
             DB::raw('COALESCE(SUM(CASE WHEN routes.vehicle_id IN (' . Vehicle::VEHICLES['gasoline_car'] . ', ' . Vehicle::VEHICLES['diesel_car'] . ') THEN 1 ELSE 0 END), 0) as total_car_routes'),
             DB::raw('COALESCE(SUM(CASE WHEN routes.vehicle_id = ' . Vehicle::VEHICLES['walking'] . ' THEN 1 ELSE 0 END), 0) as total_walking_routes'),
             DB::raw('COALESCE(SUM(CASE WHEN routes.vehicle_id = ' . Vehicle::VEHICLES['bicycle'] . ' THEN 1 ELSE 0 END), 0) as total_bicycle_routes'),
-            DB::raw('COALESCE(SUM(CASE WHEN routes.vehicle_id = ' . Vehicle::VEHICLES['bus'] . ' THEN 1 ELSE 0 END), 0) as total_bus_routes')
+            DB::raw('COALESCE(SUM(CASE WHEN routes.vehicle_id = ' . Vehicle::VEHICLES['bus'] . ' THEN 1 ELSE 0 END), 0) as total_bus_routes'),
+            DB::raw('COALESCE(SUM(CASE WHEN routes.vehicle_id = ' . Vehicle::VEHICLES['motorcycle'] . ' THEN 1 ELSE 0 END), 0) as total_motorcycle_routes'),
+            DB::raw('COALESCE(SUM(CASE WHEN routes.vehicle_id = ' . Vehicle::VEHICLES['metro'] . ' THEN 1 ELSE 0 END), 0) as total_metro_routes'),
         )
         ->join('users', 'routes.user_id', '=', 'users.id')
         ->whereMonth('routes.created_at', $this->date->month)
@@ -103,6 +105,8 @@ class UsersSheet implements FromCollection, WithHeadings, WithTitle
             'Total de Rotas a Pé' => 'total_walking_routes',
             'Total de Rotas de Bicicleta' => 'total_bicycle_routes',
             'Total de Rotas de Ônibus' => 'total_bus_routes',
+            'Total de Rotas de Motocicleta' => 'total_motorcycle_routes',
+            'Total de Rotas de Metrô' => 'total_metro_routes',
         ];
 
         $numericFields = [
@@ -117,6 +121,8 @@ class UsersSheet implements FromCollection, WithHeadings, WithTitle
             'total_walking_routes',
             'total_bicycle_routes',
             'total_bus_routes',
+            'total_motorcycle_routes',
+            'total_metro_routes',
         ];
 
         $final = [];

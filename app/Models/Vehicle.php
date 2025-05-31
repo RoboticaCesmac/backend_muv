@@ -16,6 +16,8 @@ class Vehicle extends BaseModel
         'bicycle' => 3,
         'walking' => 4,
         'bus' => 5,
+        'motorcycle' => 6,
+        'metro' => 7,
     ];
 
     protected $fillable = [
