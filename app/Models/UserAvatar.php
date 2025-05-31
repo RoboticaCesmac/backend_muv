@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\BaseModel;
 
 class UserAvatar extends BaseModel
 {
