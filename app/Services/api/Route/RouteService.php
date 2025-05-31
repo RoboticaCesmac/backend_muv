@@ -31,6 +31,7 @@ class RouteService
         $page = $request->input('page', 1);
 
         return $this->route
+            ->where('route_status_id', RouteStatusEnum::getId(RouteStatusEnum::Completed))
             ->orderBy('created_at', 'desc')
             ->skip(($page - 1) * $perPage)
             ->where('user_id', $user->id)
@@ -43,7 +44,6 @@ class RouteService
         return DB::transaction(function () use ($data) {
             $user = Auth::user();
 
-            // Fechar todas as rotas em progresso antes de iniciar nova
             $openRoutes = $this->route->newQuery()
                 ->where('user_id', $user->id)
                 ->where('route_status_id', RouteStatusEnum::getId(RouteStatusEnum::InProgress))
@@ -52,7 +52,6 @@ class RouteService
 
             $this->closeOpenedRoutes($openRoutes, $user);
 
-            // cria a nova rota
             $newRoute = $this->route->create([
                 'user_id'         => $user->id,
                 'vehicle_id'      => $data['vehicle_id'],
@@ -60,7 +59,6 @@ class RouteService
                 'started_at'      => now(),
             ]);
 
-            // registra o primeiro ponto da nova rota
             $newRoute->routePoints()->create([
                 'route_id'  => $newRoute->id,
                 'latitude'  => $data['latitude'],
@@ -182,13 +180,10 @@ class RouteService
      */
     private function calculateCarbonFootprint(float $distanceKm, $vehicle): float
     {
-        // Emissão que ocorreria com um carro a gasolina na mesma distância
         $gasolineCarEmission = $distanceKm * self::GASOLINE_CAR_EMISSION_FACTOR;
         
-        // Emissão real do veículo utilizado
         $actualEmission = $distanceKm * ($vehicle->co2_per_km ?? 0);
         
-        // Carbono economizado (valor positivo representa economia)
         $carbonSaved = $gasolineCarEmission - $actualEmission;
         
         return round($carbonSaved, 2);

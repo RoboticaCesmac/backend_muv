@@ -1,20 +1,14 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\User;
 
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
-use App\Http\Resources\Vehicle\VehicleUrlResource;
 use App\Http\Resources\UserAvatar\UserAvatarUrlResource;
+use App\Http\Resources\Vehicle\VehicleUrlResource;
+use Illuminate\Http\Resources\Json\JsonResource;
 
-class MobileUserResource extends JsonResource
+class UserMobileResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
-    public function toArray(Request $request): array
+    public function toArray($request)
     {
         return [
             'id' => $this->id,
@@ -33,4 +27,4 @@ class MobileUserResource extends JsonResource
             'updated_at' => $this->updated_at,
         ];
     }
-} 
+}
