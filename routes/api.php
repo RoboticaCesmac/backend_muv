@@ -36,6 +36,7 @@ Route::prefix('v1')->group(function () {
             });
 
             Route::prefix('user')->group(function () {
+                Route::get('status', [UserController::class, 'stats']);
                 Route::post('first-login', [UserController::class, 'firstLogin']);
                 Route::patch('user-vehicle', [UserController::class, 'updateVehicle']);
                 Route::patch('user-avatar', [UserController::class, 'updateAvatar']);

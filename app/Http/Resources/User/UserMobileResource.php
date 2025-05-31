@@ -8,6 +8,15 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class UserMobileResource extends JsonResource
 {
+    protected $period;
+
+    public function __construct($resource, $period = null)
+    {
+        parent::__construct($resource);
+
+        $this->period = $period;
+    }
+
     public function toArray($request)
     {
         return [

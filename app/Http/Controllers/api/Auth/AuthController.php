@@ -49,11 +49,11 @@ class AuthController extends Controller
     /**
      * Get the authenticated User.
      */
-    public function me(): JsonResponse
+    public function me(Request $request): JsonResponse
     {
         $user = $this->authService->me();
         
-        return response()->json(new UserMobileResource($user));
+        return response()->json(new UserMobileResource($user, $request->query('period')));
     }
 
     /**

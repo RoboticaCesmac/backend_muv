@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\URL;
 
 class User extends Authenticatable implements JWTSubjectContract
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, SoftDeletes;
 
     /**
@@ -188,24 +187,36 @@ class User extends Authenticatable implements JWTSubjectContract
         return $this->is_first_login;
     }
 
-    public function getPerfilDataAttribute(): array
+    /**
+     * Get profile data with custom period filter
+     * 
+     * @param string|null $period Period filter: 'month', 'all', or null (defaults to 'month')
+     * @return array
+     */
+    public function getPerfilDataAttribute(?string $period = 'month'): array
     {
-        $routes = $this->routes()->where('created_at', '>=', now()->subMonth())->get();
+        $routesQuery = $this->routes();
+
+        if ($period === 'month') {
+            $routesQuery->where('created_at', '>=', now()->subMonth());
+        }
+        
+        $routeStats = $routesQuery->selectRaw('
+            COALESCE(ROUND(SUM(carbon_footprint), 2), 0) as total_carbon_footprint,
+            COALESCE(ROUND(SUM(points), 2), 0) as total_points,
+            COALESCE(ROUND(SUM(distance_km), 2), 0) as distance_traveled
+        ')->first();
+
+        $totalCarbonFootprint = $routeStats->total_carbon_footprint;
+        $totalPoints = $routeStats->total_points;
+        $distanceTraveled = $routeStats->distance_traveled;
 
         $levels = UserLevel::orderBy('carbon_footprint_required', 'asc')->get();
 
-        $totalCarbonFootprint = round($routes->sum('carbon_footprint'), 2) ?? 0;
-
-        $totalPoints = round($routes->sum('points'), 2) ?? 0;
-
-        $distanceTraveled = round($routes->sum('distance_km'), 2) ?? 0;
-
         $currentLevel = $levels->firstWhere('carbon_footprint_required', '<=', $totalCarbonFootprint);
-
         $nextLevel = $levels->firstWhere('carbon_footprint_required', '>', $totalCarbonFootprint);
 
         $carbonFootprintToNextLevel = $nextLevel ? $nextLevel->carbon_footprint_required - $totalCarbonFootprint : 0;
-
         $totalCarbonFootprintOfNextLevel = $nextLevel ? $nextLevel->carbon_footprint_required : $currentLevel->carbon_footprint_required;
 
         return [
