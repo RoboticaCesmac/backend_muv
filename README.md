@@ -4,11 +4,12 @@ Sistema de gerenciamento de rotas e trajetos desenvolvido com Laravel 12, Vue 3 
 
 ## 📋 Requisitos
 
-- PHP >= 8.2
-- Composer
-- Node.js >= 18.x
-- PostgreSQL >= 14
-- Docker & Docker Compose (opcional)
+- **PHP:** >= 8.2 (extensões: pdo, pdo_pgsql, mbstring, xml, bcmath, curl, zip)
+- **Composer:** >= 2.6
+- **Node.js:** >= 18.x
+- **PostgreSQL:** >= 14
+- **Nginx/Apache:** qualquer versão recente
+- **Docker & Docker Compose:** opcional (desenvolvimento)
 
 ## 🚀 Instalação
 
