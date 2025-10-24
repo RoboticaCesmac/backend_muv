@@ -36,18 +36,20 @@ cmd = "php /app/artisan config:cache && php /app/artisan route:cache && php /app
 # --- Definição de Todos os Nossos Arquivos de Configuração ---
 [staticAssets]
 
-# 1. Configuração principal do Supervisor
+# 1. Configuração principal do Supervisor (Corrigida)
 "supervisord.conf" = """
 [supervisord]
 nodaemon=true
-logfile=/var/log/supervisord.log
-pidfile=/var/run/supervisord.pid
+user=root                    ; <--- ADICIONADO (remove o log CRIT)
+logfile=/dev/null            ; <--- MUDADO (não escreve log)
+logfile_maxbytes=0           ; <--- MUDADO
+pidfile=/tmp/supervisord.pid ; <--- MUDADO (usa /tmp)
 
 [include]
 files = /etc/supervisor/conf.d/*.conf
 """
 
-# 2. Configuração do PHP-FPM
+# 2. Configuração do PHP-FPM (Sem mudanças, já estava ok)
 "php-fpm.conf" = """
 [www]
 listen = 127.0.0.1:9000
@@ -63,11 +65,11 @@ pm.start_servers = 3
 clear_env = no
 """
 
-# 3. Configuração do Nginx (Estática e Corrigida)
+# 3. Configuração do Nginx (Corrigida)
 "nginx.conf" = """
 user root root;
 worker_processes 4;
-pid /var/run/nginx.pid;
+pid /tmp/nginx.pid;           ; <--- MUDADO (usa /tmp)
 events {
   worker_connections  4096;
 }
@@ -78,8 +80,10 @@ http {
   log_format    main '$remote_addr - $remote_user [$time_local]  $status '
       '"$request" $body_bytes_sent "$http_referer" '
       '"$http_user_agent" "$http_x_forwarded_for"';
-  access_log /var/log/nginx-access.log;
-  error_log /var/log/nginx-error.log;
+  
+  access_log /dev/stdout main;  ; <--- MUDADO (envia para stdout)
+  error_log /dev/stderr;        ; <--- MUDADO (envia para stderr)
+  
   sendfile        on;
   tcp_nopush      on;
   server_names_hash_bucket_size 128;
@@ -117,27 +121,25 @@ http {
 }
 """
 
-# 4. Worker do Supervisor para o Nginx
+# 4. Worker do Supervisor para o Nginx (Corrigido)
 "worker-nginx.conf" = """
 [program:nginx]
 command=nginx -g 'daemon off;' -c /etc/nginx/nginx.conf
 autostart=true
 autorestart=true
-stdout_logfile=/var/log/nginx-stdout.log
-stderr_logfile=/var/log/nginx-stderr.log
+; --- LINHAS DE LOG REMOVIDAS (para herdar do supervisor) ---
 """
 
-# 5. Worker do Supervisor para o PHP-FPM
+# 5. Worker do Supervisor para o PHP-FPM (Corrigido)
 "worker-phpfpm.conf" = """
 [program:php-fpm]
 command=php-fpm -y /etc/php-fpm.conf -F
 autostart=true
 autorestart=true
-stdout_logfile=/var/log/php-fpm-stdout.log
-stderr_logfile=/var/log/php-fpm-stderr.log
+; --- LINHAS DE LOG REMOVIDAS (para herdar do supervisor) ---
 """
 
-# 6. Worker do Supervisor para as Queues do Laravel
+# 6. Worker do Supervisor para as Queues do Laravel (Corrigido)
 "worker-laravel.conf" = """
 [program:worker-laravel]
 process_name=%(program_name)s_%(process_num)02d
@@ -145,6 +147,5 @@ command=php /app/artisan queue:work --sleep=3 --tries=3
 autostart=true
 autorestart=true
 numprocs=4
-stdout_logfile=/var/log/worker-laravel.log
-stderr_logfile=/var/log/worker-laravel.log
+; --- LINHAS DE LOG REMOVIDAS (para herdar do supervisor) ---
 """
