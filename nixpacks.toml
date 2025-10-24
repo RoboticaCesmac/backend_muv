@@ -20,6 +20,7 @@ cmds = [
   
   # 3. Copia os arquivos de configuração do supervisor
   "mkdir -p /etc/supervisor/conf.d/",
+  "mkdir -p /etc/nginx/",
   "cp /assets/supervisord.conf /etc/supervisord.conf",
   "cp /assets/php-fpm.conf /etc/php-fpm.conf",
   "cp /assets/nginx.conf /etc/nginx/nginx.conf",
