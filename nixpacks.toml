@@ -3,7 +3,7 @@
 # E também instala o "supervisor" (gerenciador de processos) via Nix.
 [phases.setup]
 providers = ["php", "nginx"]
-nixPkgs = ["supervisor"]
+nixPkgs = ["python3Packages.supervisor"]
 
 # Fase 2: Build
 # Cria os diretórios de configuração e copia nossos arquivos
