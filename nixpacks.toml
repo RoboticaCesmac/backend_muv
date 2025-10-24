@@ -18,12 +18,17 @@ cmds = [
   # 2. Builda os assets
   "npm run build",
   
-  # 3. Copia os arquivos de configuração do supervisor
+  # 3. Cria os diretórios
   "mkdir -p /etc/supervisor/conf.d/",
   "mkdir -p /etc/nginx/",
+  
+  # 4. Copia os arquivos de configuração
   "cp /assets/supervisord.conf /etc/supervisord.conf",
   "cp /assets/php-fpm.conf /etc/php-fpm.conf",
   "cp /assets/nginx.conf /etc/nginx/nginx.conf",
+  
+  "cp /assets/fastcgi_params /etc/nginx/fastcgi_params",
+  
   "cp /assets/worker-nginx.conf /etc/supervisor/conf.d/",
   "cp /assets/worker-phpfpm.conf /etc/supervisor/conf.d/",
   "cp /assets/worker-laravel.conf /etc/supervisor/conf.d/"
