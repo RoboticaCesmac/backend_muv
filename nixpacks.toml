@@ -1,15 +1,20 @@
 # Fase 1: Setup
-# Define que queremos os "providers" de PHP e Nginx.
-# E também instala o "supervisor" (gerenciador de processos) via Nix.
 [phases.setup]
-providers = ["php", "nginx"]
+providers = ["php", "nginx", "nodejs"] 
 nixPkgs = ["python3Packages.supervisor"]
 
 # Fase 2: Build
-# Cria os diretórios de configuração e copia nossos arquivos
-# (definidos lá embaixo em [staticAssets]) para seus devidos lugares.
 [phases.build]
 cmds = [
+  # --- ADICIONAMOS OS COMANDOS DE BUILD AQUI ---
+  # Garantimos que o composer e o npm rodem no momento certo.
+  "composer install --no-dev --ignore-platform-reqs",
+  "npm ci",
+  "npm run build", # Se você usa Vite/Mix, isso é essencial
+  "php artisan optimize:clear", # Boa prática de build
+  # ----------------------------------------------------
+  
+  # Nossos comandos de cópia de configuração
   "mkdir -p /etc/supervisor/conf.d/",
   "cp /assets/supervisord.conf /etc/supervisord.conf",
   "cp /assets/php-fpm.conf /etc/php-fpm.conf",
@@ -20,14 +25,10 @@ cmds = [
 ]
 
 # Fase 3: Start
-# O comando de início. Em vez do comando bugado do Nixpacks,
-# nós apenas iniciamos o supervisor. O supervisor vai ler os arquivos .conf
-# e iniciar o Nginx, o PHP-FPM e os workers para nós.
 [start]
 cmd = "supervisord -c /etc/supervisord.conf -n"
 
 # --- Definição de Todos os Nossos Arquivos de Configuração ---
-# O Nixpacks vai criar esses arquivos dentro do container em /assets/
 [staticAssets]
 
 # 1. Configuração principal do Supervisor
@@ -42,8 +43,6 @@ files = /etc/supervisor/conf.d/*.conf
 """
 
 # 2. Configuração do PHP-FPM
-# (Usado pelo 'worker-phpfpm.conf')
-# Nota: Usamos 'user = root', pois os containers do Nixpacks rodam como root.
 "php-fpm.conf" = """
 [www]
 listen = 127.0.0.1:9000
@@ -60,8 +59,6 @@ clear_env = no
 """
 
 # 3. Configuração do Nginx (Estática e Corrigida)
-# Esta é a parte mais importante. É um arquivo Nginx completo
-# e *sem* a "duplicate location /".
 "nginx.conf" = """
 user root root;
 worker_processes 4;
@@ -86,7 +83,6 @@ http {
     listen [::]:80;
     server_name localhost;
     
-    # Aponta para a sua pasta public
     root /app/public; 
     
     add_header X-Content-Type-Options "nosniff";
@@ -94,7 +90,6 @@ http {
     index index.php;
     charset utf-8;
     
-    # Esta é a ÚNICA 'location /'
     location / {
       try_files $uri $uri/ /index.php?$query_string;
     }
@@ -105,7 +100,7 @@ http {
     error_page 404 /index.php;
     
     location ~ \\.php$ {
-      fastcgi_pass 127.0.0.1:9000; # Conecta no PHP-FPM
+      fastcgi_pass 127.0.0.1:9000;
       fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
       include /etc/nginx/fastcgi_params;
     }
@@ -138,7 +133,6 @@ stderr_logfile=/var/log/php-fpm-stderr.log
 """
 
 # 6. Worker do Supervisor para as Queues do Laravel
-# (Ajuste 'numprocs' para quantos workers você quiser)
 "worker-laravel.conf" = """
 [program:worker-laravel]
 process_name=%(program_name)s_%(process_num)02d
