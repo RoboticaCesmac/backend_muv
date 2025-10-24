@@ -182,4 +182,3 @@ autostart=true
 autorestart=true
 numprocs=4
 """
-Agora sim: o Nginx vai encontrar o fastcgi_params
