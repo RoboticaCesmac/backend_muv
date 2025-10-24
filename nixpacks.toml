@@ -1,0 +1,152 @@
+# Fase 1: Setup
+# Define que queremos os "providers" de PHP e Nginx.
+# E também instala o "supervisor" (gerenciador de processos) via Nix.
+[phases.setup]
+providers = ["php", "nginx"]
+nixPkgs = ["supervisor"]
+
+# Fase 2: Build
+# Cria os diretórios de configuração e copia nossos arquivos
+# (definidos lá embaixo em [staticAssets]) para seus devidos lugares.
+[phases.build]
+cmds = [
+  "mkdir -p /etc/supervisor/conf.d/",
+  "cp /assets/supervisord.conf /etc/supervisord.conf",
+  "cp /assets/php-fpm.conf /etc/php-fpm.conf",
+  "cp /assets/nginx.conf /etc/nginx/nginx.conf",
+  "cp /assets/worker-nginx.conf /etc/supervisor/conf.d/",
+  "cp /assets/worker-phpfpm.conf /etc/supervisor/conf.d/",
+  "cp /assets/worker-laravel.conf /etc/supervisor/conf.d/"
+]
+
+# Fase 3: Start
+# O comando de início. Em vez do comando bugado do Nixpacks,
+# nós apenas iniciamos o supervisor. O supervisor vai ler os arquivos .conf
+# e iniciar o Nginx, o PHP-FPM e os workers para nós.
+[start]
+cmd = "supervisord -c /etc/supervisord.conf -n"
+
+# --- Definição de Todos os Nossos Arquivos de Configuração ---
+# O Nixpacks vai criar esses arquivos dentro do container em /assets/
+[staticAssets]
+
+# 1. Configuração principal do Supervisor
+"supervisord.conf" = """
+[supervisord]
+nodaemon=true
+logfile=/var/log/supervisord.log
+pidfile=/var/run/supervisord.pid
+
+[include]
+files = /etc/supervisor/conf.d/*.conf
+"""
+
+# 2. Configuração do PHP-FPM
+# (Usado pelo 'worker-phpfpm.conf')
+# Nota: Usamos 'user = root', pois os containers do Nixpacks rodam como root.
+# Usar 'www-data' (como no exemplo que você achou) pode falhar.
+"php-fpm.conf" = """
+[www]
+listen = 127.0.0.1:9000
+user = root
+group = root
+listen.owner = root
+listen.group = root
+pm = dynamic
+pm.max_children = 10
+pm.min_spare_servers = 2
+pm.max_spare_servers = 5
+pm.start_servers = 3
+clear_env = no
+"""
+
+# 3. Configuração do Nginx (Estática e Corrigida)
+# Esta é a parte mais importante. É um arquivo Nginx completo
+# e *sem* a "duplicate location /".
+"nginx.conf" = """
+user root root;
+worker_processes 4;
+pid /var/run/nginx.pid;
+events {
+  worker_connections  4096;
+}
+http {
+  include       /etc/nginx/mime.types;
+  index         index.html index.htm index.php;
+  default_type application/octet-stream;
+  log_format    main '$remote_addr - $remote_user [$time_local]  $status '
+      '"$request" $body_bytes_sent "$http_referer" '
+      '"$http_user_agent" "$http_x_forwarded_for"';
+  access_log /var/log/nginx-access.log;
+  error_log /var/log/nginx-error.log;
+  sendfile        on;
+  tcp_nopush      on;
+  server_names_hash_bucket_size 128;
+  server {
+    listen 80;
+    listen [::]:80;
+    server_name localhost;
+    
+    # Aponta para a sua pasta public
+    root /app/public; 
+    
+    add_header X-Content-Type-Options "nosniff";
+    client_max_body_size 35M;
+    index index.php;
+    charset utf-8;
+    
+    # Esta é a ÚNICA 'location /'
+    location / {
+      try_files $uri $uri/ /index.php?$query_string;
+    }
+    
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location = /robots.txt  { access_log off; log_not_found off; }
+    
+    error_page 404 /index.php;
+    
+    location ~ \.php$ {
+      fastcgi_pass 127.0.0.1:9000; # Conecta no PHP-FPM
+      fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+      include /etc/nginx/fastcgi_params;
+    }
+    
+    location ~ /\.(?!well-known).* {
+      deny all;
+    }
+  }
+}
+"""
+
+# 4. Worker do Supervisor para o Nginx
+"worker-nginx.conf" = """
+[program:nginx]
+command=nginx -g 'daemon off;' -c /etc/nginx/nginx.conf
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/nginx-stdout.log
+stderr_logfile=/var/log/nginx-stderr.log
+"""
+
+# 5. Worker do Supervisor para o PHP-FPM
+"worker-phpfpm.conf" = """
+[program:php-fpm]
+command=php-fpm -y /etc/php-fpm.conf -F
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/php-fpm-stdout.log
+stderr_logfile=/var/log/php-fpm-stderr.log
+"""
+
+# 6. Worker do Supervisor para as Queues do Laravel
+# (Ajuste 'numprocs' para quantos workers você quiser)
+"worker-laravel.conf" = """
+[program:worker-laravel]
+process_name=%(program_name)s_%(process_num)02d
+command=php /app/artisan queue:work --sleep=3 --tries=3
+autostart=true
+autorestart=true
+numprocs=4
+stdout_logfile=/var/log/worker-laravel.log
+stderr_logfile=/var/log/worker-laravel.log
+"""
