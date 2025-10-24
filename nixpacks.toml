@@ -41,21 +41,27 @@ cmd = "php /app/artisan config:cache && php /app/artisan route:cache && php /app
 # --- Definição de Todos os Nossos Arquivos de Configuração ---
 [staticAssets]
 
-# 1. Configuração principal do Supervisor (Corrigida)
+# 1. Configuração principal do Supervisor (Já estava correta)
 "supervisord.conf" = """
 [supervisord]
 nodaemon=true
-user=root                    ; <--- ADICIONADO (remove o log CRIT)
-logfile=/dev/null            ; <--- MUDADO (não escreve log)
-logfile_maxbytes=0           ; <--- MUDADO
-pidfile=/tmp/supervisord.pid ; <--- MUDADO (usa /tmp)
+user=root
+logfile=/dev/null
+logfile_maxbytes=0
+pidfile=/tmp/supervisord.pid
 
 [include]
 files = /etc/supervisor/conf.d/*.conf
 """
 
-# 2. Configuração do PHP-FPM (Sem mudanças, já estava ok)
+# 2. Configuração do PHP-FPM (<<< MODIFICADA >>>)
+# Adicionamos a seção [global]
 "php-fpm.conf" = """
+[global]
+pid = /tmp/php-fpm.pid
+error_log = /dev/stderr
+daemonize = no
+
 [www]
 listen = 127.0.0.1:9000
 user = root
@@ -70,11 +76,11 @@ pm.start_servers = 3
 clear_env = no
 """
 
-# 3. Configuração do Nginx (Corrigida)
+# 3. Configuração do Nginx (Já estava correta)
 "nginx.conf" = """
 user root root;
 worker_processes 4;
-pid /tmp/nginx.pid;           ; <--- MUDADO (usa /tmp)
+pid /tmp/nginx.pid;
 events {
   worker_connections  4096;
 }
@@ -86,8 +92,8 @@ http {
       '"$request" $body_bytes_sent "$http_referer" '
       '"$http_user_agent" "$http_x_forwarded_for"';
   
-  access_log /dev/stdout main;  ; <--- MUDADO (envia para stdout)
-  error_log /dev/stderr;        ; <--- MUDADO (envia para stderr)
+  access_log /dev/stdout main;
+  error_log /dev/stderr;
   
   sendfile        on;
   tcp_nopush      on;
@@ -126,25 +132,48 @@ http {
 }
 """
 
-# 4. Worker do Supervisor para o Nginx (Corrigido)
+# 4. <<< NOVO ARQUIVO ADICIONADO >>>
+# Este é o arquivo que o Nginx estava sentindo falta.
+"fastcgi_params" = """
+fastcgi_param  QUERY_STRING       $query_string;
+fastcgi_param  REQUEST_METHOD     $request_method;
+fastcgi_param  CONTENT_TYPE       $content_type;
+fastcgi_param  CONTENT_LENGTH     $content_length;
+fastcgi_param  SCRIPT_NAME        $fastcgi_script_name;
+fastcgi_param  REQUEST_URI        $request_uri;
+fastcgi_param  DOCUMENT_URI       $document_uri;
+fastcgi_param  DOCUMENT_ROOT      $document_root;
+fastcgi_param  SERVER_PROTOCOL    $server_protocol;
+fastcgi_param  REQUEST_SCHEME     $scheme;
+fastcgi_param  HTTPS              $https if_not_empty;
+fastcgi_param  GATEWAY_INTERFACE  CGI/1.1;
+fastcgi_param  SERVER_SOFTWARE    nginx/$nginx_version;
+fastcgi_param  REMOTE_ADDR        $remote_addr;
+fastcgi_param  REMOTE_PORT        $remote_port;
+fastcgi_param  SERVER_ADDR        $server_addr;
+fastcgi_param  SERVER_PORT        $server_port;
+fastcgi_param  SERVER_NAME        $server_name;
+fastcgi_param  REDIRECT_STATUS    200;
+fastcgi_param  SCRIPT_FILENAME    $document_root$fastcgi_script_name;
+"""
+
+# 5. Worker do Supervisor para o Nginx (Já estava correto)
 "worker-nginx.conf" = """
 [program:nginx]
 command=nginx -g 'daemon off;' -c /etc/nginx/nginx.conf
 autostart=true
 autorestart=true
-; --- LINHAS DE LOG REMOVIDAS (para herdar do supervisor) ---
 """
 
-# 5. Worker do Supervisor para o PHP-FPM (Corrigido)
+# 6. Worker do Supervisor para o PHP-FPM (Já estava correto)
 "worker-phpfpm.conf" = """
 [program:php-fpm]
 command=php-fpm -y /etc/php-fpm.conf -F
 autostart=true
 autorestart=true
-; --- LINHAS DE LOG REMOVIDAS (para herdar do supervisor) ---
 """
 
-# 6. Worker do Supervisor para as Queues do Laravel (Corrigido)
+# 7. Worker do Supervisor para as Queues do Laravel (Já estava correto)
 "worker-laravel.conf" = """
 [program:worker-laravel]
 process_name=%(program_name)s_%(process_num)02d
@@ -152,5 +181,5 @@ command=php /app/artisan queue:work --sleep=3 --tries=3
 autostart=true
 autorestart=true
 numprocs=4
-; --- LINHAS DE LOG REMOVIDAS (para herdar do supervisor) ---
 """
+Agora sim: o Nginx vai encontrar o fastcgi_params
