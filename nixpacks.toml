@@ -11,14 +11,14 @@ nixPkgs = [
 # Fase 2: Build
 [phases.build]
 cmds = [
+  # 1. Instala dependências
   "composer install --no-dev --ignore-platform-reqs",
   "npm ci",
-  "npm run build", # Se você usa Vite/Mix, isso é essencial
-  "php artisan config:clear",
-  "php artisan route:clear",
-  "php artisan view:clear",
-  "CACHE_DRIVER=file php artisan cache:clear",
   
+  # 2. Builda os assets
+  "npm run build",
+  
+  # 3. Copia os arquivos de configuração do supervisor
   "mkdir -p /etc/supervisor/conf.d/",
   "cp /assets/supervisord.conf /etc/supervisord.conf",
   "cp /assets/php-fpm.conf /etc/php-fpm.conf",
@@ -30,7 +30,7 @@ cmds = [
 
 # Fase 3: Start
 [start]
-cmd = "supervisord -c /etc/supervisord.conf -n"
+cmd = "php /app/artisan config:cache && php /app/artisan route:cache && php /app/artisan view:cache && php /app/artisan migrate --force && supervisord -c /etc/supervisord.conf -n"
 
 # --- Definição de Todos os Nossos Arquivos de Configuração ---
 [staticAssets]
