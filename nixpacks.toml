@@ -26,8 +26,10 @@ cmds = [
   "cp /assets/supervisord.conf /etc/supervisord.conf",
   "cp /assets/php-fpm.conf /etc/php-fpm.conf",
   "cp /assets/nginx.conf /etc/nginx/nginx.conf",
-  
   "cp /assets/fastcgi_params /etc/nginx/fastcgi_params",
+  
+  # <<< ADICIONE ESTA LINHA AQUI >>>
+  "cp /assets/mime.types /etc/nginx/mime.types",
   
   "cp /assets/worker-nginx.conf /etc/supervisor/conf.d/",
   "cp /assets/worker-phpfpm.conf /etc/supervisor/conf.d/",
@@ -41,12 +43,12 @@ cmd = "php /app/artisan config:cache && php /app/artisan route:cache && php /app
 # --- Definição de Todos os Nossos Arquivos de Configuração ---
 [staticAssets]
 
-# 1. Configuração principal do Supervisor (Já estava correta)
+# 1. Configuração principal do Supervisor (<<< MODIFICADA >>>)
 "supervisord.conf" = """
 [supervisord]
 nodaemon=true
 user=root
-logfile=/dev/null
+logfile=/dev/stdout            ; <--- MUDADO (Para vermos os logs!)
 logfile_maxbytes=0
 pidfile=/tmp/supervisord.pid
 
@@ -55,7 +57,6 @@ files = /etc/supervisor/conf.d/*.conf
 """
 
 # 2. Configuração do PHP-FPM (<<< MODIFICADA >>>)
-# Adicionamos a seção [global]
 "php-fpm.conf" = """
 [global]
 pid = /tmp/php-fpm.pid
@@ -74,9 +75,12 @@ pm.min_spare_servers = 2
 pm.max_spare_servers = 5
 pm.start_servers = 3
 clear_env = no
+
+; Log para o stdout do supervisor
+catch_workers_output = yes
 """
 
-# 3. Configuração do Nginx (Já estava correta)
+# 3. Configuração do Nginx (Sem mudanças)
 "nginx.conf" = """
 user root root;
 worker_processes 4;
@@ -102,29 +106,22 @@ http {
     listen 80;
     listen [::]:80;
     server_name localhost;
-    
     root /app/public; 
-    
     add_header X-Content-Type-Options "nosniff";
     client_max_body_size 35M;
     index index.php;
     charset utf-8;
-    
     location / {
       try_files $uri $uri/ /index.php?$query_string;
     }
-    
     location = /favicon.ico { access_log off; log_not_found off; }
     location = /robots.txt  { access_log off; log_not_found off; }
-    
     error_page 404 /index.php;
-    
     location ~ \\.php$ {
       fastcgi_pass 127.0.0.1:9000;
       fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
       include /etc/nginx/fastcgi_params;
     }
-    
     location ~ /\\.(?!well-known).* {
       deny all;
     }
@@ -132,8 +129,7 @@ http {
 }
 """
 
-# 4. <<< NOVO ARQUIVO ADICIONADO >>>
-# Este é o arquivo que o Nginx estava sentindo falta.
+# 4. fastcgi_params (Sem mudanças)
 "fastcgi_params" = """
 fastcgi_param  QUERY_STRING       $query_string;
 fastcgi_param  REQUEST_METHOD     $request_method;
@@ -157,23 +153,78 @@ fastcgi_param  REDIRECT_STATUS    200;
 fastcgi_param  SCRIPT_FILENAME    $document_root$fastcgi_script_name;
 """
 
-# 5. Worker do Supervisor para o Nginx (Já estava correto)
+# 5. <<< NOVO ARQUIVO ADICIONADO >>>
+# mime.types (um conjunto básico, mas funcional)
+"mime.types" = """
+types {
+    text/html                             html htm shtml;
+    text/css                              css;
+    text/xml                              xml;
+    image/gif                             gif;
+    image/jpeg                            jpeg jpg;
+    application/javascript                js;
+    application/atom+xml                  atom;
+    application/rss+xml                   rss;
+    text/plain                            txt;
+    image/png                             png;
+    image/svg+xml                         svg svgz;
+    image/webp                            webp;
+    image/x-icon                          ico;
+    application/font-woff                 woff;
+    application/java-archive              jar war ear;
+    application/json                      json;
+    application/msword                    doc;
+    application/pdf                       pdf;
+    application/postscript                ps eps ai;
+    application/vnd.ms-excel              xls;
+    application/vnd.ms-fontobject         eot;
+    application/vnd.ms-powerpoint         ppt;
+    application/wasm                      wasm;
+    application/x-7z-compressed           7z;
+    application/x-rar-compressed          rar;
+    application/x-shockwave-flash         swf;
+    application/zip                       zip;
+    application/octet-stream              bin exe dll;
+    application/octet-stream              deb;
+    application/octet-stream              dmg;
+    application/octet-stream              iso img;
+    audio/midi                            mid midi kar;
+    audio/mpeg                            mp3;
+    audio/ogg                             ogg;
+    video/mp4                             mp4;
+    video/mpeg                            mpeg mpg;
+    video/quicktime                       mov;
+    video/webm                            webm;
+    video/x-msvideo                       avi;
+}
+"""
+
+# 6. Worker do Supervisor para o Nginx (<<< MODIFICADO >>>)
+# Redireciona logs para o stdout/stderr do supervisor
 "worker-nginx.conf" = """
 [program:nginx]
 command=nginx -g 'daemon off;' -c /etc/nginx/nginx.conf
 autostart=true
 autorestart=true
+stdout_logfile=/dev/stdout
+stdout_logfile_maxbytes=0
+stderr_logfile=/dev/stderr
+stderr_logfile_maxbytes=0
 """
 
-# 6. Worker do Supervisor para o PHP-FPM (Já estava correto)
+# 7. Worker do Supervisor para o PHP-FPM (<<< MODIFICADO >>>)
 "worker-phpfpm.conf" = """
 [program:php-fpm]
 command=php-fpm -y /etc/php-fpm.conf -F
 autostart=true
 autorestart=true
+stdout_logfile=/dev/stdout
+stdout_logfile_maxbytes=0
+stderr_logfile=/dev/stderr
+stderr_logfile_maxbytes=0
 """
 
-# 7. Worker do Supervisor para as Queues do Laravel (Já estava correto)
+# 8. Worker do Supervisor para as Queues do Laravel (<<< MODIFICADO >>>)
 "worker-laravel.conf" = """
 [program:worker-laravel]
 process_name=%(program_name)s_%(process_num)02d
@@ -181,4 +232,8 @@ command=php /app/artisan queue:work --sleep=3 --tries=3
 autostart=true
 autorestart=true
 numprocs=4
+stdout_logfile=/dev/stdout
+stdout_logfile_maxbytes=0
+stderr_logfile=/dev/stderr
+stderr_logfile_maxbytes=0
 """
