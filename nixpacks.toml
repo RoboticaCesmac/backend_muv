@@ -14,7 +14,10 @@ cmds = [
   "composer install --no-dev --ignore-platform-reqs",
   "npm ci",
   "npm run build", # Se você usa Vite/Mix, isso é essencial
-  "CACHE_DRIVER=file DB_CONNECTION=sqlite php artisan optimize:clear", # Boa prática de build
+  "php artisan config:clear",
+  "php artisan route:clear",
+  "php artisan view:clear",
+  "CACHE_DRIVER=file php artisan cache:clear"
   
   "mkdir -p /etc/supervisor/conf.d/",
   "cp /assets/supervisord.conf /etc/supervisord.conf",
