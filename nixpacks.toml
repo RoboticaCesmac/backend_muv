@@ -1,7 +1,12 @@
 # Fase 1: Setup
 [phases.setup]
-providers = ["php", "nginx", "nodejs"] 
-nixPkgs = ["python3Packages.supervisor", "php", "composer", "nodejs", "nginx"]
+nixPkgs = [
+  "python3Packages.supervisor",
+  "php83",
+  "php83Packages.composer",
+  "nodejs_20",
+  "nginx"
+]
 
 # Fase 2: Build
 [phases.build]
