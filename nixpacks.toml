@@ -44,7 +44,6 @@ files = /etc/supervisor/conf.d/*.conf
 # 2. Configuração do PHP-FPM
 # (Usado pelo 'worker-phpfpm.conf')
 # Nota: Usamos 'user = root', pois os containers do Nixpacks rodam como root.
-# Usar 'www-data' (como no exemplo que você achou) pode falhar.
 "php-fpm.conf" = """
 [www]
 listen = 127.0.0.1:9000
@@ -105,13 +104,13 @@ http {
     
     error_page 404 /index.php;
     
-    location ~ \.php$ {
+    location ~ \\.php$ {
       fastcgi_pass 127.0.0.1:9000; # Conecta no PHP-FPM
       fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
       include /etc/nginx/fastcgi_params;
     }
     
-    location ~ /\.(?!well-known).* {
+    location ~ /\\.(?!well-known).* {
       deny all;
     }
   }
