@@ -1,20 +1,16 @@
 # Fase 1: Setup
 [phases.setup]
 providers = ["php", "nginx", "nodejs"] 
-nixPkgs = ["python3Packages.supervisor"]
+nixPkgs = ["python3Packages.supervisor", "php", "composer", "nodejs", "nginx"]
 
 # Fase 2: Build
 [phases.build]
 cmds = [
-  # --- ADICIONAMOS OS COMANDOS DE BUILD AQUI ---
-  # Garantimos que o composer e o npm rodem no momento certo.
   "composer install --no-dev --ignore-platform-reqs",
   "npm ci",
   "npm run build", # Se você usa Vite/Mix, isso é essencial
   "php artisan optimize:clear", # Boa prática de build
-  # ----------------------------------------------------
   
-  # Nossos comandos de cópia de configuração
   "mkdir -p /etc/supervisor/conf.d/",
   "cp /assets/supervisord.conf /etc/supervisord.conf",
   "cp /assets/php-fpm.conf /etc/php-fpm.conf",
