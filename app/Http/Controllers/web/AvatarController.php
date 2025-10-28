@@ -43,7 +43,7 @@ class AvatarController extends Controller
         
         $avatar = UserAvatar::create([
             'name' => $validated['name'],
-            'avatar_path' => $path,
+            'avatar_path' => 'storage/' . $path,
             'is_default' => false,
         ]);
 
