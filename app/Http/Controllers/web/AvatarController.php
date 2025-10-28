@@ -37,12 +37,13 @@ class AvatarController extends Controller
         $file = $request->file('avatar');
         $fileName = Str::slug($validated['name']) . '_' . time() . '.' . $file->getClientOriginalExtension();
         
-        // Save the file to public/images/avatars directory
-        $file->move(public_path('images/avatars'), $fileName);
+        // Salva em 'storage/app/public/images/avatars'
+        // A variável $path conterá 'images/avatars/nome_do_arquivo.jpg'
+        $path = $file->storeAs('images/avatars', $fileName, 'public');
         
         $avatar = UserAvatar::create([
             'name' => $validated['name'],
-            'avatar_path' => 'images/avatars/' . $fileName,
+            'avatar_path' => $path,
             'is_default' => false,
         ]);
 
