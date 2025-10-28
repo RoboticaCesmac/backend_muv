@@ -22,6 +22,11 @@ cmd = '/assets/start.sh'
 # Transform the nginx configuration
 node /assets/scripts/prestart.mjs /assets/nginx.template.conf /etc/nginx.conf
 
+# Remove o link antigo (se existir) e cria o novo
+# Isso garante que o link esteja correto a cada deploy/reinício
+rm -rf /app/public/storage
+php artisan storage:link
+
 # Start supervisor
 supervisord -c /etc/supervisord.conf -n
 '''
